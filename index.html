@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>端午节主题班会互动网页课件</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-locked">
+  <section class="auth-screen" aria-label="授权验证">
+    <div class="auth-card">
+      <div class="brand-mark">端</div>
+      <span class="eyebrow">Access Code</span>
+      <h1>端午节主题班会互动网页课件</h1>
+      <p>请输入授权码后进入课件。1 天授权码会在当前浏览器保留 24 小时，永久授权码会长期生效。</p>
+      <form class="auth-form" id="authForm">
+        <label>
+          授权码
+          <input type="password" id="authCode" placeholder="请输入授权码" autocomplete="off">
+        </label>
+        <button class="primary-btn" type="submit">进入课件</button>
+      </form>
+      <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主导航">
+      <div class="brand">
+        <div class="brand-mark">端</div>
+        <div>
+          <strong>端午节主题班会</strong>
+          <span>互动网页课件</span>
+        </div>
+      </div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view="dashboard" aria-label="打开总览">总览</button>
+        <button class="nav-item" data-view="learning" aria-label="打开学习中心">学习</button>
+        <button class="nav-item" data-view="interaction" aria-label="打开互动中心">互动</button>
+        <button class="nav-item" data-view="quiz" aria-label="打开知识闯关">闯关</button>
+        <button class="nav-item" data-view="outcomes" aria-label="打开成果中心">成果</button>
+      </nav>
+      <div class="side-panel">
+        <span>今日节令</span>
+        <strong>仲夏端阳</strong>
+        <p>粽叶清香，龙舟竞渡，五彩绳寄平安。</p>
+        <button class="auth-logout" type="button" id="logoutAuth">退出授权</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="view active" id="dashboard">
+        <div class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow">Dragon Boat Festival</span>
+            <h1>端午节主题班会互动网页课件</h1>
+            <p>围绕班会导入、文化学习、互动体验、知识检测和成果展示，把端午习俗做成可讲解、可参与、可生成成果的网页课件。</p>
+            <div class="hero-actions">
+              <button class="primary-btn" data-jump="learning">进入学习</button>
+              <button class="primary-btn" data-jump="interaction">互动体验</button>
+              <button class="primary-btn" data-jump="quiz">开始闯关</button>
+              <button class="ghost-btn" data-jump="outcomes">查看成果</button>
+            </div>
+          </div>
+          <div class="dragon-scene" aria-hidden="true">
+            <div class="sun"></div>
+            <div class="cloud cloud-one"></div>
+            <div class="cloud cloud-two"></div>
+            <div class="boat">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="waves wave-one"></div>
+            <div class="waves wave-two"></div>
+            <div class="zongzi zongzi-one"></div>
+            <div class="zongzi zongzi-two"></div>
+          </div>
+        </div>
+
+        <div class="today-panel">
+          <div class="mini-heading">
+            <span>Today Tasks</span>
+            <strong>今日学习任务</strong>
+          </div>
+          <div class="today-grid" id="todayTasks"></div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat">
+            <span>教学流程</span>
+            <strong>5</strong>
+            <p>目标、学习、互动、检测、报告完整闭环</p>
+          </article>
+          <article class="stat">
+            <span>文化模块</span>
+            <strong>10</strong>
+            <p>由来、人物、习俗、饮食、诗词、地域、非遗与现代传承</p>
+          </article>
+          <article class="stat">
+            <span>互动玩法</span>
+            <strong>3</strong>
+            <p>龙舟竞速、粽子工坊、端午活动打卡</p>
+          </article>
+          <article class="stat">
+            <span>闯关题库</span>
+            <strong>12</strong>
+            <p>基础、理解、拓展三层题库，答完显示分数、称号和错题解析</p>
+          </article>
+          <article class="stat">
+            <span>生成成果</span>
+            <strong>PNG</strong>
+            <p>自定义姓名、祝福语和主题后下载祝福卡</p>
+          </article>
+        </div>
+
+        <div class="timeline">
+          <div>
+            <span class="step-index">01</span>
+            <strong>明确学习目标</strong>
+            <p>适合课堂导入，也适合家庭自主学习。</p>
+          </div>
+          <div>
+            <span class="step-index">02</span>
+            <strong>学习端午文化</strong>
+            <p>先了解故事、习俗和节日符号。</p>
+          </div>
+          <div>
+            <span class="step-index">03</span>
+            <strong>体验龙舟竞速</strong>
+            <p>通过操作获得分数，增强节日参与感。</p>
+          </div>
+          <div>
+            <span class="step-index">04</span>
+            <strong>完成知识闯关</strong>
+            <p>通过题目检验学习成果，课件记录错题。</p>
+          </div>
+          <div>
+            <span class="step-index">05</span>
+            <strong>查看学习报告</strong>
+            <p>汇总答题、互动、打卡和亲子任务。</p>
+          </div>
+          <div>
+            <span class="step-index">06</span>
+            <strong>生成祝福卡片</strong>
+            <p>留下个人化的节日祝福并导出图片。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="learning">
+        <div class="section-heading">
+          <span class="eyebrow">Learning Center</span>
+          <h2>学习中心</h2>
+        </div>
+        <div class="lesson-grid">
+          <article class="lesson-card">
+            <span>适用对象</span>
+            <strong>小学中高年级 / 初中低年级</strong>
+            <p>也适合家庭亲子共学、传统节日主题班会和综合实践活动。</p>
+          </article>
+          <article class="lesson-card">
+            <span>建议时长</span>
+            <strong>25-40 分钟</strong>
+            <p>教师可按课堂时间选择完整流程或只使用文化学习、互动、报告三个部分。</p>
+          </article>
+          <article class="lesson-card">
+            <span>学习目标</span>
+            <strong>知习俗 · 会表达 · 能传承</strong>
+            <p>了解端午来源和习俗，理解节日背后的情感价值，并完成一份可展示成果。</p>
+          </article>
+        </div>
+        <div class="flow-board" id="flowBoard"></div>
+        <div class="notice-grid">
+          <article class="notice-card">
+            <h3>给老师</h3>
+            <p>建议按“目标导入 - 文化学习 - 互动体验 - 分层闯关 - 学习报告”组织课堂，可把报告作为课堂评价依据。</p>
+          </article>
+          <article class="notice-card">
+            <h3>给家长</h3>
+            <p>建议陪孩子完成亲子任务，聊一聊家乡端午习俗。课件只使用浏览器本地存储，不上传个人信息。</p>
+          </article>
+        </div>
+        <div class="classroom-board">
+          <div class="mini-heading">
+            <span>Classroom Mode</span>
+            <strong>课堂展示模式</strong>
+          </div>
+          <div class="classroom-stage" id="classroomStage">
+            <span id="classroomStep">第 1 步</span>
+            <h3 id="classroomTitle">目标导入</h3>
+            <p id="classroomText">用 1 分钟说明今天要了解端午来源、习俗和传承价值。</p>
+          </div>
+          <div class="classroom-controls">
+            <button class="ghost-btn" type="button" id="prevSlide">上一步</button>
+            <button class="primary-btn" type="button" id="nextSlide">下一步</button>
+            <button class="ghost-btn" type="button" id="resetSlide">回到开头</button>
+          </div>
+        </div>
+        <div class="section-heading merged-heading">
+          <span class="eyebrow">Culture Library</span>
+          <h2>端午文化学习</h2>
+        </div>
+        <div class="culture-grid" id="cultureGrid"></div>
+      </section>
+
+      <section class="view" id="interaction">
+        <div class="section-heading">
+          <span class="eyebrow">Interactive Center</span>
+          <h2>端午互动中心</h2>
+        </div>
+        <div class="game-layout">
+          <div class="race-card">
+            <div class="mini-heading">
+              <span>玩法一</span>
+              <strong>龙舟竞速</strong>
+            </div>
+            <div class="game-hud">
+              <div>
+                <span>得分</span>
+                <strong id="gameScore">0</strong>
+              </div>
+              <div>
+                <span>剩余</span>
+                <strong id="gameTime">30s</strong>
+              </div>
+              <div>
+                <span>状态</span>
+                <strong id="gameState">待开始</strong>
+              </div>
+            </div>
+            <div class="race-stage" id="raceStage" tabindex="0" aria-label="龙舟竞速游戏区域">
+              <div class="lane lane-one"></div>
+              <div class="lane lane-two"></div>
+              <div class="lane lane-three"></div>
+              <div class="player-boat" id="playerBoat">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="game-controls">
+              <button class="ghost-btn" type="button" id="moveUp">上移</button>
+              <button class="primary-btn" type="button" id="startGame">开始游戏</button>
+              <button class="ghost-btn" type="button" id="moveDown">下移</button>
+            </div>
+          </div>
+          <aside class="result-panel game-panel">
+            <span>玩法目标</span>
+            <strong id="gameRank">击鼓待发</strong>
+            <p id="gameTip">30 秒内收集粽子加 10 分，避开浪花和礁石。可用按钮或键盘上下方向键换道。</p>
+            <div class="culture-tip">
+              <strong>文化提示</strong>
+              <p id="gameCultureNote">龙舟竞渡强调鼓点、方向和划手配合，是端午节中很能体现协作精神的活动。</p>
+            </div>
+            <div class="game-legend">
+              <span><i class="legend-zongzi"></i>粽子 +10</span>
+              <span><i class="legend-rock"></i>障碍 -8</span>
+            </div>
+          </aside>
+        </div>
+
+        <div class="interaction-grid">
+          <section class="workshop-card">
+            <div class="mini-heading">
+              <span>玩法二</span>
+              <strong>粽子工坊</strong>
+            </div>
+            <p class="muted-copy">根据目标口味选择合适配料，提交后课件会判断搭配是否准确。</p>
+            <div class="recipe-target">
+              <span>目标口味</span>
+              <strong id="recipeName">加载中</strong>
+              <p id="recipeHint"></p>
+            </div>
+            <div class="ingredient-grid" id="ingredientGrid"></div>
+            <div class="workshop-actions">
+              <button class="primary-btn" type="button" id="submitRecipe">提交搭配</button>
+              <button class="ghost-btn" type="button" id="nextRecipe">换一个口味</button>
+            </div>
+            <div class="explain" id="recipeFeedback" role="status" aria-live="polite"></div>
+          </section>
+
+          <section class="workshop-card">
+            <div class="mini-heading">
+              <span>玩法三</span>
+              <strong>端午活动打卡</strong>
+            </div>
+            <p class="muted-copy">完成活动任务，形成一份端午体验记录。</p>
+            <div class="check-progress">
+              <div>
+                <strong id="checkCount">0/6</strong>
+                <span>已完成</span>
+              </div>
+              <div class="mini-progress">
+                <div id="checkBar"></div>
+              </div>
+            </div>
+            <div class="task-list" id="taskList"></div>
+            <button class="ghost-btn" type="button" id="resetTasks">清空打卡</button>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="quiz">
+        <div class="section-heading">
+          <span class="eyebrow">Knowledge Challenge</span>
+          <h2>端午知识闯关</h2>
+        </div>
+        <div class="quiz-layout">
+          <div class="quiz-box" id="quizBox">
+            <div class="level-tabs" id="levelTabs">
+              <button class="active" type="button" data-level="基础">基础</button>
+              <button type="button" data-level="理解">理解</button>
+              <button type="button" data-level="拓展">拓展</button>
+            </div>
+            <div class="quiz-topline">
+              <span id="quizProgress">第 1 / 8 题</span>
+              <span id="quizScore">得分 0</span>
+            </div>
+            <h3 id="questionText"></h3>
+            <div class="answers" id="answers"></div>
+            <div class="explain" id="explain" role="status" aria-live="polite"></div>
+            <div class="quiz-actions">
+              <button class="primary-btn" id="nextQuestion">下一题</button>
+              <button class="ghost-btn" id="restartQuiz">重新开始</button>
+            </div>
+          </div>
+
+          <div class="quiz-box result-summary hidden" id="quizResult">
+            <span class="eyebrow">Result</span>
+            <h3 id="finalTitle">闯关完成</h3>
+            <div class="score-ring">
+              <strong id="finalScore">0</strong>
+              <span>分</span>
+            </div>
+            <p id="finalText"></p>
+            <div class="wrong-list" id="wrongList"></div>
+            <div class="quiz-actions">
+              <button class="primary-btn" id="retryFromResult">再闯一次</button>
+              <button class="ghost-btn" data-jump="outcomes">制作祝福卡</button>
+            </div>
+          </div>
+
+          <aside class="result-panel">
+            <span>当前称号</span>
+            <strong id="rankTitle">初入端阳</strong>
+            <p id="rankText">完成闯关后会根据得分生成称号。</p>
+            <div class="mini-progress">
+              <div id="scoreBar"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="outcomes">
+        <div class="section-heading">
+          <span class="eyebrow">Outcomes</span>
+          <h2>成果中心</h2>
+        </div>
+        <div class="report-layout">
+          <section class="report-card report-main">
+            <div class="mini-heading">
+              <span>综合评价</span>
+              <strong id="reportTitle">等待学习数据</strong>
+            </div>
+            <div class="report-score">
+              <strong id="reportScore">0</strong>
+              <span>综合分</span>
+            </div>
+            <p id="reportSummary">完成文化学习、互动游戏、知识闯关和打卡后，这里会生成学习反馈。</p>
+            <div class="report-actions">
+              <button class="primary-btn" type="button" id="refreshReport">刷新报告</button>
+              <button class="ghost-btn" type="button" id="retryMistakes">错题再练</button>
+              <button class="ghost-btn" type="button" id="downloadReport">导出报告</button>
+              <button class="ghost-btn" type="button" id="downloadCertificate">生成证书</button>
+              <button class="ghost-btn danger-btn" type="button" id="clearLearningData">清空学习记录</button>
+            </div>
+            <p class="certificate-hint" id="certificateHint">完成学习任务后，可生成“端午文化小达人”证书。</p>
+          </section>
+          <section class="report-card">
+            <h3>学习数据</h3>
+            <div class="metric-list" id="metricList"></div>
+          </section>
+          <section class="report-card">
+            <h3>错题与建议</h3>
+            <div class="wrong-list" id="reportWrongList"></div>
+          </section>
+          <section class="report-card">
+            <h3>亲子任务</h3>
+            <div class="parent-task-list" id="parentTaskList"></div>
+          </section>
+        </div>
+        <div class="source-panel">
+          <h3>资料来源与隐私说明</h3>
+          <p>内容依据常见端午民俗知识整理，适合课堂活动和亲子共学使用。不同地区习俗存在差异，教学时可结合本地资料补充。</p>
+          <p>本页面不要求真实姓名，不上传照片，不连接服务器；答题、打卡和祝福卡草稿仅保存在当前浏览器本地。</p>
+          <div class="source-list">
+            <span>建议补充资料</span>
+            <strong>传统节日读本、地方民俗资料、非遗公开资料、学校校本课程材料</strong>
+          </div>
+        </div>
+        <div class="section-heading merged-heading">
+          <span class="eyebrow">Greeting Card</span>
+          <h2>端午祝福卡生成</h2>
+        </div>
+        <div class="card-maker">
+          <form class="card-form">
+            <label>
+              姓名
+              <input type="text" id="cardName" value="李同学" maxlength="10">
+            </label>
+            <label>
+              祝福语
+              <textarea id="cardMessage" maxlength="48">端午安康，愿你一岁一安，一粽一念。</textarea>
+            </label>
+            <label>
+              风格
+              <select id="cardTheme">
+                <option value="green">青粽雅韵</option>
+                <option value="red">朱砂纳福</option>
+                <option value="blue">龙舟竞渡</option>
+              </select>
+            </label>
+            <button class="primary-btn" type="button" id="downloadCard">下载 PNG</button>
+          </form>
+          <div class="festival-card theme-green" id="festivalCard">
+            <div class="card-ribbon">端午安康</div>
+            <div class="card-visual">
+              <div class="big-zongzi"></div>
+              <div class="cord cord-one"></div>
+              <div class="cord cord-two"></div>
+            </div>
+            <h3 id="previewName">李同学</h3>
+            <p id="previewMessage">端午安康，愿你一岁一安，一粽一念。</p>
+            <span>五月初五 · 粽叶飘香</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
