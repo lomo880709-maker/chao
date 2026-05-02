@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>端午安康</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --green: #4A7C59;
+      --green-light: #6B9B7A;
+      --green-dark: #3A5C45;
+      --white: #F5F0E6;
+      --cream: #FFFEF9;
+      --red: #C73E3A;
+      --red-dark: #A63330;
+      --gold: #D4A84B;
+      --text: #2D2A26;
+      --shadow: rgba(74, 124, 89, 0.2);
+    }
+
+    body {
+      font-family: 'Noto Serif SC', serif;
+      background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+      min-height: 100vh;
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+
+    /* 龙舟背景动画 */
+    .dragon-boat-bg {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .boat {
+      position: absolute;
+      font-size: 40px;
+      animation: boatMove 12s linear infinite;
+      opacity: 0.3;
+    }
+
+    .boat:nth-child(1) { bottom: 20px; animation-delay: 0s; }
+    .boat:nth-child(2) { bottom: 50px; animation-delay: -4s; font-size: 30px; }
+    .boat:nth-child(3) { bottom: 10px; animation-delay: -8s; font-size: 25px; }
+
+    @keyframes boatMove {
+      from { left: -80px; }
+      to { left: calc(100% + 80px); }
+    }
+
+    /* 波浪动画 */
+    .waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%233A5C45' fill-opacity='0.3' d='M0,160L48,170.7C96,181,192,203,288,192C384,181,480,139,576,128C672,117,768,139,864,165.3C960,192,1056,224,1152,213.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+      animation: waveMove 8s linear infinite;
+    }
+
+    @keyframes waveMove {
+      from { background-position-x: 0; }
+      to { background-position-x: 1440px; }
+    }
+
+    /* 顶部标题 */
+    header {
+      text-align: center;
+      padding: 20px 0 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-family: 'ZCOOL XiaoWei', serif;
+      font-size: 2.5rem;
+      color: var(--white);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      letter-spacing: 8px;
+    }
+
+    .subtitle {
+      color: var(--gold);
+      font-size: 0.9rem;
+      margin-top: 8px;
+      letter-spacing: 4px;
+    }
+
+    /* 导航 */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.active {
+      background: var(--white);
+      color: var(--green-dark);
+      border-color: var(--white);
+      font-weight: 700;
+    }
+
+    /* 主内容区 */
+    main {
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page {
+      display: none;
+      background: var(--cream);
+      border-radius: 24px;
+      padding: 30px 24px;
+      box-shadow: 0 20px 60px var(--shadow);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-title {
+      font-size: 1.4rem;
+      color: var(--green-dark);
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px dashed var(--green-light);
+    }
+
+    /* 祝福卡片页 */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .template-card {
+      aspect-ratio: 1;
+      border-radius: 16px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .template-card:hover {
+      transform: scale(1.05);
+    }
+
+    .template-card.selected {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(199, 62, 58, 0.3);
+    }
+
+    .template-card .emoji {
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+
+    .template-1 { background: linear-gradient(135deg, #FFE4E1, #FFB6C1); color: #8B4513; }
+    .template-2 { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: var(--green-dark); }
+    .template-3 { background: linear-gradient(135deg, #FFF8DC, #FFE4B5); color: #8B4513; }
+    .template-4 { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); color: #1565C0; }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--green-light);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: 'Noto Serif SC', serif;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--green);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: 'Noto Serif SC', serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      color: white;
+      box-shadow: 0 4px 15px rgba(199, 62, 58, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(199, 62, 58, 0.5);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: white;
+      box-shadow: 0 4px 15px var(--shadow);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--shadow);
+    }
+
+    /* 卡片预览 */
+    .card-preview {
+      margin-top: 24px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .card-preview.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .card-preview canvas {
+      width: 100%;
+      display: block;
+    }
+
+    /* 龙舟点兵页 */
+    .fortune-display {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .fortune-main {
+      font-size: 1.2rem;
+      color: var(--text);
+      line-height: 1.8;
+      padding: 20px;
+      background: linear-gradient(135deg, #FFF8E7, #FFFEF9);
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+
+    .fortune-tips {
+      font-size: 0.95rem;
+      color: var(--green-dark);
+      padding: 16px;
+      background: linear-gradient(135deg, #E8F5E9, #F5F0E6);
+      border-radius: 12px;
+      border-left: 4px solid var(--green);
+    }
+
+    .fortune-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      animation: bounce 2s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* 问答页 */
+    .quiz-progress {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green-light);
+      opacity: 0.3;
+      transition: all 0.3s;
+    }
+
+    .progress-dot.active {
+      opacity: 1;
+      background: var(--green);
+      transform: scale(1.2);
+    }
+
+    .progress-dot.correct {
+      background: var(--green);
+      opacity: 1;
+    }
+
+    .progress-dot.wrong {
+      background: var(--red);
+      opacity: 1;
+    }
+
+    .quiz-question {
+      font-size: 1.1rem;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      padding: 16px 20px;
+      border: 2px solid var(--green-light);
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+      text-align: left;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--green);
+      background: #F0FFF0;
+    }
+
+    .quiz-option.selected {
+      border-color: var(--green);
+      background: var(--green);
+      color: white;
+    }
+
+    .quiz-option.correct {
+      border-color: var(--green);
+      background: var(--green);
+      color: white;
+    }
+
+    .quiz-option.wrong {
+      border-color: var(--red);
+      background: var(--red);
+      color: white;
+    }
+
+    /* 结果页 */
+    .result-display {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .result-rank {
+      font-size: 1.3rem;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    .result-rank span {
+      font-size: 2.5rem;
+      font-weight: 700;
+      display: block;
+      margin-top: 8px;
+      font-family: 'ZCOOL XiaoWei', serif;
+    }
+
+    .result-detail {
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    .result-share {
+      color: var(--green-dark);
+      font-size: 0.9rem;
+      padding: 16px;
+      background: linear-gradient(135deg, #E8F5E9, #F5F0E6);
+      border-radius: 12px;
+    }
+
+    /* 关于页 */
+    .about-content h3 {
+      color: var(--green-dark);
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      margin-top: 20px;
+    }
+
+    .about-content h3:first-child {
+      margin-top: 0;
+    }
+
+    .about-content p {
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .about-content ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .about-content li {
+      color: var(--text);
+      padding: 8px 0 8px 28px;
+      position: relative;
+      font-size: 0.95rem;
+    }
+
+    .about-content li::before {
+      content: "🐲";
+      position: absolute;
+      left: 0;
+    }
+
+    /* 动画反馈 */
+    .shake {
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* 响应式 */
+    @media (max-width: 480px) {
+      body { padding: 15px; }
+      h1 { font-size: 2rem; letter-spacing: 4px; }
+      .nav-btn { padding: 10px 16px; font-size: 0.85rem; }
+      .page { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 龙舟背景 -->
+  <div class="dragon-boat-bg">
+    <div class="boat">🚣</div>
+    <div class="boat">🚣</div>
+    <div class="boat">🚣</div>
+  </div>
+  <div class="waves"></div>
+
+  <header>
+    <h1>端午安康</h1>
+    <p class="subtitle">DUANWU FESTIVAL</p>
+  </header>
+
+  <nav>
+    <button class="nav-btn active" onclick="switchPage('blessing')">祝福卡片</button>
+    <button class="nav-btn" onclick="switchPage('fortune')">龙舟点兵</button>
+    <button class="nav-btn" onclick="switchPage('quiz')">端午问答</button>
+    <button class="nav-btn" onclick="switchPage('about')">关于端午</button>
+  </nav>
+
+  <main>
+    <!-- 祝福卡片页 -->
+    <section id="blessing" class="page active">
+      <h2 class="page-title">🪶 生成端午祝福卡片</h2>
+
+      <div class="template-grid">
+        <div class="template-card template-1 selected" onclick="selectTemplate(1)">
+          <span class="emoji">🌿</span>
+          <span>端午安康</span>
+        </div>
+        <div class="template-card template-2" onclick="selectTemplate(2)">
+          <span class="emoji">🏆</span>
+          <span>粽情端午</span>
+        </div>
+        <div class="template-card template-3" onclick="selectTemplate(3)">
+          <span class="emoji">🎋</span>
+          <span>粽享时光</span>
+        </div>
+        <div class="template-card template-4" onclick="selectTemplate(4)">
+          <span class="emoji">✨</span>
+          <span>端午吉祥</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>输入祝福对象的名字</label>
+        <input type="text" id="blessingName" placeholder="如：张三" maxlength="10">
+      </div>
+
+      <button class="btn btn-secondary" onclick="generateBlessing()">生成卡片</button>
+
+      <div class="card-preview" id="blessingPreview">
+        <canvas id="blessingCanvas" width="600" height="800"></canvas>
+        <button class="btn btn-primary" style="margin-top: 16px;" onclick="downloadCard()">保存图片分享</button>
+      </div>
+    </section>
+
+    <!-- 龙舟点兵页 -->
+    <section id="fortune" class="page">
+      <h2 class="page-title">🚣 龙舟点兵 · 今日运势</h2>
+
+      <div class="fortune-display">
+        <div class="fortune-icon" id="fortuneIcon">🎲</div>
+        <div class="fortune-main" id="fortuneText">
+          点击下方按钮，看看今日龙舟运势如何
+        </div>
+        <div class="fortune-tips" id="fortuneTips">
+          龙舟已就位，等你一声令下 ⬇
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="drawFortune()">开始点兵</button>
+    </section>
+
+    <!-- 端午问答页 -->
+    <section id="quiz" class="page">
+      <h2 class="page-title">🧠 端午知识问答</h2>
+
+      <div class="quiz-progress" id="quizProgress">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+      </div>
+
+      <div id="quizContent">
+        <div class="quiz-question" id="quizQuestion">第一题加载中...</div>
+        <div class="quiz-options" id="quizOptions"></div>
+      </div>
+
+      <div id="quizResult" class="result-display" style="display: none;">
+        <div class="result-rank">
+          你的端午段位是
+          <span id="resultRank">青铜</span>
+        </div>
+        <div class="result-detail" id="resultDetail"></div>
+        <div class="result-share" id="resultShare"></div>
+        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="resetQuiz()">再玩一次</button>
+      </div>
+    </section>
+
+    <!-- 关于端午页 -->
+    <section id="about" class="page">
+      <h2 class="page-title">🐲 端午节的由来</h2>
+
+      <div class="about-content">
+        <h3>📜 历史起源</h3>
+        <p>端午节，又称端阳节、龙舟节、重午节等，起源于中国，最初是上古先民以龙舟竞渡形式祭祀龙祖的节日。后因传说战国时期的楚国诗人屈原在五月五日跳汨罗江自尽，后来人们也将端午节作为纪念屈原的节日。</p>
+
+        <h3>🍃 端午习俗</h3>
+        <ul>
+          <li>赛龙舟 — 祈求风调雨顺</li>
+          <li>吃粽子 — 纪念屈原投江</li>
+          <li>挂艾草 — 驱邪避瘟</li>
+          <li>佩戴香囊 — 驱虫保健</li>
+          <li>喝雄黄酒 — 驱毒辟邪</li>
+        </ul>
+
+        <h3>🗺️ 南北差异</h3>
+        <p>北方粽子以甜味为主，常用红枣、豆沙做馅；南方粽子则以咸味著称，馅料丰富有蛋黄、鲜肉、腊肠等。赛龙舟活动在南方更为盛行。</p>
+
+        <h3>📖 相关诗词</h3>
+        <p>唐代文秀《端午》诗云：「节分端午自谁言，万古传闻为屈原。堪笑楚江空渺渺，不能洗得直臣冤。」</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 全局状态
+    let selectedTemplate = 1;
+    let currentQuestion = 0;
+    let correctCount = 0;
+    let quizAnswered = false;
+    let generatedCanvas = null;
+
+    // 模板数据
+    const templates = {
+      1: {
+        title: '端午安康',
+        color1: '#FFE4E1',
+        color2: '#FFB6C1',
+        icon: '🌿'
+      },
+      2: {
+        title: '粽情端午',
+        color1: '#E8F5E9',
+        color2: '#C8E6C9',
+        icon: '🏆'
+      },
+      3: {
+        title: '粽享时光',
+        color1: '#FFF8DC',
+        color2: '#FFE4B5',
+        icon: '🎋'
+      },
+      4: {
+        title: '端午吉祥',
+        color1: '#E3F2FD',
+        color2: '#BBDEFB',
+        icon: '✨'
+      }
+    };
+
+    // 问答数据
+    const questions = [
+      {
+        q: '端午节是为了纪念哪位历史人物？',
+        options: ['杜甫', '屈原', '孔子', '李白'],
+        correct: 1
+      },
+      {
+        q: '端午节的习俗不包括以下哪项？',
+        options: ['赛龙舟', '吃粽子', '赏月', '挂艾草'],
+        correct: 2
+      },
+      {
+        q: '粽子最早是为了纪念屈原而制作的什么物品的替代品？',
+        options: ['衣物', '竹筒', '米糕', '龙鳞'],
+        correct: 1
+      },
+      {
+        q: '端午节在每年农历的几月几日？',
+        options: ['三月三', '四月四', '五月五', '六月六'],
+        correct: 2
+      },
+      {
+        q: '以下哪个不是端午节的别称？',
+        options: ['端阳节', '龙舟节', '重午节', '花朝节'],
+        correct: 3
+      }
+    ];
+
+    // 运势数据
+    const fortunes = [
+      { icon: '🌟', title: '大吉', desc: '今日龙舟冲劲十足！', tip: '适合大展拳脚，会有意想不到的好运降临' },
+      { icon: '😊', title: '吉', desc: '端午安康，万事顺意', tip: '保持心情愉悦，会遇到好事哦' },
+      { icon: '🍀', title: '中吉', desc: '粽子香甜，好事将近', tip: '适合与人分享，会收获更多' },
+      { icon: '🌤️', title: '平', desc: '风平浪静，顺其自然', tip: '稳扎稳打，不宜冒进' },
+      { icon: '🌧️', title: '小凶', desc: '小有波折，但无大碍', tip: '出门注意安全，心平气和度过' }
+    ];
+
+    const ranks = [
+      { name: '青铜端午', min: 0, desc: '端午小白，需要多了解传统文化哦' },
+      { name: '白银端午', min: 2, desc: '对端午有一定了解，继续加油' },
+      { name: '黄金端午', min: 3, desc: '端午达人，知识储备不错' },
+      { name: '钻石端午', min: 4, desc: '端午专家，屈原来找你讨论诗词' },
+      { name: '王者端午', min: 5, desc: '端午百科全书，端午知识无所不知！' }
+    ];
+
+    // 切换页面
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      document.getElementById(pageId).classList.add('active');
+      event.target.classList.add('active');
+
+      if (pageId === 'quiz' && currentQuestion === 0) {
+        renderQuestion();
+      }
+    }
+
+    // 选择模板
+    function selectTemplate(num) {
+      selectedTemplate = num;
+      document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('.template-card')[num - 1].classList.add('selected');
+    }
+
+    // 生成祝福卡片
+    function generateBlessing() {
+      const name = document.getElementById('blessingName').value.trim() || '朋友';
+      const template = templates[selectedTemplate];
+      const canvas = document.getElementById('blessingCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // 清空画布
+      ctx.clearRect(0, 0, 600, 800);
+
+      // 绘制背景
+      const gradient = ctx.createLinearGradient(0, 0, 600, 800);
+      gradient.addColorStop(0, template.color1);
+      gradient.addColorStop(1, template.color2);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 600, 800);
+
+      // 绘制装饰条纹
+      ctx.fillStyle = 'rgba(74, 124, 89, 0.1)';
+      for (let i = 0; i < 20; i++) {
+        ctx.fillRect(0, i * 50, 600, 25);
+      }
+
+      // 绘制边框
+      ctx.strokeStyle = 'rgba(74, 124, 89, 0.3)';
+      ctx.lineWidth = 20;
+      ctx.strokeRect(30, 30, 540, 740);
+
+      // 绘制龙鳞装饰
+      ctx.fillStyle = 'rgba(199, 62, 58, 0.1)';
+      for (let i = 0; i < 8; i++) {
+        ctx.beginPath();
+        ctx.arc(550, 100 + i * 80, 30, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 顶部图标
+      ctx.font = '80px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(template.icon, 300, 140);
+
+      // 标题
+      ctx.font = 'bold 56px "ZCOOL XiaoWei", serif';
+      ctx.fillStyle = '#2D2A26';
+      ctx.fillText(template.title, 300, 240);
+
+      // 分隔线
+      ctx.strokeStyle = '#C73E3A';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(150, 280);
+      ctx.lineTo(450, 280);
+      ctx.stroke();
+
+      // 端午安康文字
+      ctx.font = '36px "Noto Serif SC", serif';
+      ctx.fillStyle = '#4A7C59';
+      ctx.fillText('端午安康', 300, 360);
+
+      // 名字
+      ctx.font = 'bold 48px "Noto Serif SC", serif';
+      ctx.fillStyle = '#2D2A26';
+      ctx.fillText(name, 300, 440);
+
+      // 祝福语
+      ctx.font = '28px "Noto Serif SC", serif';
+      ctx.fillStyle = '#666';
+      const blessings = [
+        '愿你端午安康，阖家幸福',
+        '粽香飘万里，情深系故人',
+        '端午佳节至，愿你事事顺',
+        '粽香艾草香，平安又吉祥'
+      ];
+      ctx.fillText(blessings[selectedTemplate - 1], 300, 520);
+
+      // 底部装饰
+      ctx.font = '100px serif';
+      ctx.fillText('🐲', 300, 680);
+
+      // 日期
+      ctx.font = '24px "Noto Serif SC", serif';
+      ctx.fillStyle = '#999';
+      ctx.fillText('丙午年 · 端午安康', 300, 750);
+
+      // 显示预览
+      document.getElementById('blessingPreview').classList.add('show');
+      generatedCanvas = canvas;
+    }
+
+    // 下载卡片
+    function downloadCard() {
+      if (!generatedCanvas) return;
+
+      const link = document.createElement('a');
+      link.download = '端午祝福.png';
+      link.href = generatedCanvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // 抽签运势
+    function drawFortune() {
+      const index = Math.floor(Math.random() * fortunes.length);
+      const fortune = fortunes[index];
+
+      document.getElementById('fortuneIcon').textContent = fortune.icon;
+      document.getElementById('fortuneIcon').style.animation = 'bounce 0.5s ease';
+
+      setTimeout(() => {
+        document.getElementById('fortuneIcon').style.animation = 'bounce 2s ease infinite';
+        document.getElementById('fortuneText').innerHTML = `<strong>${fortune.title}</strong><br>${fortune.desc}`;
+        document.getElementById('fortuneTips').innerHTML = `<strong>小提示：</strong><br>${fortune.tip}`;
+      }, 500);
+    }
+
+    // 渲染问答
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById('quizQuestion').textContent = `第 ${currentQuestion + 1} 题：${q.q}`;
+
+      const optionsContainer = document.getElementById('quizOptions');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = `${['A', 'B', 'C', 'D'][i]}. ${opt}`;
+        btn.onclick = () => selectAnswer(i);
+        optionsContainer.appendChild(btn);
+      });
+
+      // 更新进度
+      document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+        dot.className = 'progress-dot';
+        if (i <= currentQuestion) dot.classList.add('active');
+      });
+
+      quizAnswered = false;
+    }
+
+    // 选择答案
+    function selectAnswer(index) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = questions[currentQuestion];
+      const options = document.querySelectorAll('.quiz-option');
+      const dots = document.querySelectorAll('.progress-dot');
+
+      options.forEach((opt, i) => {
+        if (i === q.correct) {
+          opt.classList.add('correct');
+          dots[currentQuestion].classList.add('correct');
+        } else if (i === index && index !== q.correct) {
+          opt.classList.add('wrong');
+          dots[currentQuestion].classList.add('wrong');
+        }
+      });
+
+      if (index === q.correct) correctCount++;
+
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          renderQuestion();
+        } else {
+          showResult();
+        }
+      }, 1200);
+    }
+
+    // 显示结果
+    function showResult() {
+      const rank = ranks.find(r => correctCount >= r.min) || ranks[ranks.length - 1];
+
+      document.getElementById('quizContent').style.display = 'none';
+      document.getElementById('quizResult').style.display = 'block';
+      document.getElementById('resultRank').textContent = rank.name;
+      document.getElementById('resultDetail').textContent = rank.desc;
+      document.getElementById('resultShare').innerHTML = `你答对了 <strong>${correctCount}</strong> / ${questions.length} 题<br>快把结果分享给朋友吧！`;
+
+      // 隐藏进度
+      document.getElementById('quizProgress').style.display = 'none';
+    }
+
+    // 重置问答
+    function resetQuiz() {
+      currentQuestion = 0;
+      correctCount = 0;
+      quizAnswered = false;
+
+      document.getElementById('quizContent').style.display = 'block';
+      document.getElementById('quizResult').style.display = 'none';
+      document.getElementById('quizProgress').style.display = 'flex';
+
+      renderQuestion();
+    }
+  </script>
+</body>
+</html>
