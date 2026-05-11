@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>口算自动出题器 - 幼小衔接到小学全年级</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', 'PingFang SC', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 顶部标题区 */
+        header {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .header-icons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+        }
+
+        .header-icons i {
+            margin-left: 12px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .header-icons i:nth-child(2) { animation-delay: 0.5s; }
+        .header-icons i:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .main-content {
+            padding: 25px;
+        }
+
+        /* 设置区域 */
+        .settings-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px dashed #667eea;
+        }
+
+        .settings-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .setting-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .setting-item label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .setting-item select,
+        .setting-item input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .setting-item select:focus,
+        .setting-item input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        /* 题型选择 */
+        .题型选择 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .题型选项 {
+            display: none;
+        }
+
+        .题型选项 + label {
+            padding: 10px 20px;
+            background: #e9ecef;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .题型选项:checked + label {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        /* 开始按钮 */
+        .start-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .start-btn {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .start-btn.secondary {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .start-btn.secondary:hover {
+            box-shadow: 0 8px 25px rgba(17, 153, 142, 0.5);
+        }
+
+        /* 游戏区域 */
+        .game-section {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .统计信息 {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea22, #764ba222);
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-box i {
+            margin-right: 8px;
+        }
+
+        .计时器 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f5576c;
+            font-family: monospace;
+        }
+
+        .计时器-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* 题目显示 */
+        .题目卡片 {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            border-radius: 25px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .题号 {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .算式 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            margin: 20px 0;
+        }
+
+        .答案输入 {
+            width: 100%;
+            padding: 25px;
+            font-size: 2.5rem;
+            border: 4px solid #ddd;
+            border-radius: 20px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .答案输入:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .答案输入.correct {
+            border-color: #38ef7d;
+            background: rgba(56, 239, 125, 0.1);
+            animation: pulse-green 0.5s;
+        }
+
+        .答案输入.incorrect {
+            border-color: #f5576c;
+            background: rgba(245, 87, 108, 0.1);
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .反馈 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 50px;
+        }
+
+        .反馈.correct { color: #38ef7d; }
+        .反馈.incorrect { color: #f5576c; }
+
+        .正确答案提示 {
+            font-size: 1.3rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* 按钮组 */
+        .操作按钮 {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            color: white;
+        }
+
+        .btn-next {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-skip {
+            background: #e9ecef;
+            color: #666;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 结束界面 */
+        .结果卡片 {
+            background: linear-gradient(135deg, #667eea22, #764ba222);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .结果标题 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .结果统计 {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .结果项 {
+            text-align: center;
+        }
+
+        .结果数字 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #f5576c;
+        }
+
+        .结果标签 {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 错题本 */
+        .错题本区域 {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px dashed #ddd;
+        }
+
+        .错题本标题 {
+            font-size: 1.5rem;
+            color: #f5576c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .错题列表 {
+            text-align: left;
+        }
+
+        .错题项 {
+            background: rgba(245, 87, 108, 0.1);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .错题算式 {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .错题答案 {
+            color: #38ef7d;
+            font-weight: bold;
+        }
+
+        /* 导航切换 */
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        /* Tab内容 */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 客服按钮 */
+        .customer-service {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .cs-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* 响应式 */
+        /* 平板适配 */
+        @media (max-width: 1024px) {
+            .container { max-width: 95%; }
+            header h1 { font-size: 2rem; }
+        }
+
+        /* 手机横屏 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .container { max-width: 98%; padding: 15px; }
+            header { padding: 15px; }
+            header h1 { font-size: 1.5rem; }
+            .算式 { font-size: 2rem; }
+            .答案输入 { font-size: 1.8rem; padding: 15px; height: 60px; }
+            .main-content { padding: 15px; }
+            .settings-section { padding: 15px; }
+        }
+
+        /* 手机竖屏 */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { max-width: 100%; border-radius: 15px; }
+            header { padding: 20px 15px; }
+            header h1 { font-size: 1.8rem; }
+            header p { font-size: 1rem; }
+            .header-icons { display: none; }
+            .main-content { padding: 15px; }
+            .settings-section { padding: 15px; border-radius: 12px; }
+            .setting-row { flex-direction: column; gap: 10px; }
+            .setting-item { min-width: 100%; }
+            .start-btn { padding: 12px 30px; font-size: 1.1rem; }
+            .game-section { padding: 15px; }
+            .题目卡片 { padding: 20px 15px; }
+            .算式 { font-size: 2.5rem; padding: 15px; }
+            .答案输入 { 
+                font-size: 1.8rem; 
+                padding: 15px; 
+                height: 60px;
+                border-radius: 12px;
+            }
+            .反馈 { font-size: 1.8rem; }
+            .正确答案提示 { font-size: 1.1rem; }
+            .结果数字 { font-size: 2.5rem; }
+            .结果卡片 { padding: 25px 15px; }
+            .结果统计 { gap: 15px; }
+            .操作按钮 { gap: 10px; }
+            .btn { padding: 12px 20px; font-size: 1rem; }
+        }
+
+        /* 小屏手机 */
+        @media (max-width: 480px) {
+            body { padding: 5px; }
+            .container { border-radius: 10px; }
+            header { padding: 15px 10px; }
+            header h1 { font-size: 1.5rem; }
+            .main-content { padding: 10px; }
+            .settings-section { padding: 12px; border-radius: 10px; }
+            .setting-item label { font-size: 0.9rem; }
+            .setting-item select, .setting-item input { padding: 10px; font-size: 1rem; }
+            .start-btn { padding: 10px 25px; font-size: 1rem; width: 100%; justify-content: center; }
+            .start-btn-wrapper { flex-direction: column; }
+            .nav-tabs { border-radius: 10px; }
+            .nav-tab { padding: 10px; font-size: 0.9rem; }
+            .题目卡片 { padding: 15px 10px; border-radius: 15px; }
+            .题号 { font-size: 0.9rem; }
+            .算式 { font-size: 2rem; padding: 12px; }
+            .答案输入 { font-size: 1.5rem; padding: 12px; height: 50px; }
+            .反馈 { font-size: 1.5rem; }
+            .正确答案提示 { font-size: 1rem; }
+            .操作按钮 { flex-direction: column; gap: 8px; }
+            .btn { width: 100%; justify-content: center; padding: 12px; font-size: 1rem; }
+            .结果标题 { font-size: 1.8rem; }
+            .结果数字 { font-size: 2rem; }
+            .结果标签 { font-size: 0.9rem; }
+            .customer-service { bottom: 15px; right: 15px; }
+            .cs-btn { width: 50px; height: 50px; }
+        }
+
+        /* 鼓掌动画 */
+        .applause {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        .applause.show {
+            animation: applause 1.5s forwards;
+        }
+
+        @keyframes applause {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .applause i {
+            font-size: 5rem;
+            color: #38ef7d;
+            margin: 0 15px;
+        }
+
+        .applause.show i:nth-child(1) { animation: rise 1s 0.1s ease-out forwards; }
+        .applause.show i:nth-child(2) { animation: rise 1s 0.3s ease-out forwards; }
+        .applause.show i:nth-child(3) { animation: rise 1s 0.5s ease-out forwards; }
+
+        @keyframes rise {
+            0% { opacity: 0; transform: translateY(50px) scale(0.5); }
+            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-icons">
+                <i class="fas fa-calculator"></i>
+                <i class="fas fa-bolt"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <h1>🧮 口算自动出题器</h1>
+            <p>幼小衔接 · 小学全年级适用</p>
+        </header>
+
+        <div class="main-content">
+            <!-- 导航切换 -->
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="切换标签('练习')">📝 练习模式</div>
+                <div class="nav-tab" onclick="切换标签('错题')">📋 错题本</div>
+                <div class="nav-tab" onclick="切换标签('统计')">📊 学习统计</div>
+            </div>
+
+            <!-- 练习模式 -->
+            <div class="tab-content active" id="练习">
+                <div class="settings-section" id="settingsSection">
+                    <h2><i class="fas fa-cog"></i> 出题设置</h2>
+                    
+                    <div class="setting-row">
+                        <div class="setting-item">
+                            <label>运算类型</label>
+                            <select id="运算类型">
+                                <option value="加减">➕➖ 加减法</option>
+                                <option value="乘除">✖➗ 乘除法</option>
+                                <option value="混合">➕➖✖➗ 混合运算</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>难度级别</label>
+                            <select id="难度级别" onchange="更新数字范围()">
+                                <option value="10以内">10以内（幼小衔接）</option>
+                                <option value="20以内" selected>20以内（一年级）</option>
+                                <option value="50以内">50以内（二年级）</option>
+                                <option value="100以内">100以内（三年级）</option>
+                                <option value="1000以内">1000以内（四年级）</option>
+                                <option value="万以内">万以内（五六年级）</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-item">
+                            <label>题目数量</label>
+                            <select id="题目数量">
+                                <option value="10">10题</option>
+                                <option value="20" selected>20题</option>
+                                <option value="30">30题</option>
+                                <option value="50">50题</option>
+                                <option value="100">100题</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>计时模式</label>
+                            <select id="计时模式">
+                                <option value="关闭">⏱️ 关闭计时</option>
+                                <option value="开启">⏱️ 开启计时挑战</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="start-btn-wrapper">
+                        <button class="start-btn" onclick="开始练习()">
+                            <i class="fas fa-play"></i> 开始练习
+                        </button>
+                        <button class="start-btn secondary" onclick="随机练习()">
+                            <i class="fas fa-random"></i> 随机一局
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 游戏区域 -->
+                <div class="game-section" id="gameSection">
+                    <div class="game-header">
+                        <div class="统计信息">
+                            <div class="stat-box">
+                                <i class="fas fa-check-circle"></i>
+                                <span id="正确数">0</span> / <span id="总数">0</span>
+                            </div>
+                            <div class="stat-box">
+                                <i class="fas fa-clock"></i>
+                                <span id="已用时">0</span>秒
+                            </div>
+                        </div>
+                        <div class="计时器" id="计时器显示" style="display:none;">
+                            <div class="计时器-label">⏱️ 用时</div>
+                            <span id="计时器">00:00</span>
+                        </div>
+                    </div>
+
+                    <div class="题目卡片">
+                        <div class="题号" id="题号">第 1 题</div>
+                        <div class="算式" id="算式显示">5 + 3 = ?</div>
+                        <input type="number" class="答案输入" id="答案输入" placeholder="请输入答案" onkeypress="检查回车(event)">
+                        <div class="反馈" id="反馈"></div>
+                        <div class="正确答案提示" id="正确答案提示"></div>
+                    </div>
+
+                    <div class="操作按钮">
+                        <button class="btn btn-submit" onclick="提交答案()">
+                            <i class="fas fa-check"></i> 提交答案
+                        </button>
+                        <button class="btn btn-next" onclick="下一题()" id="下一题按钮" style="display:none;">
+                            <i class="fas fa-arrow-right"></i> 下一题
+                        </button>
+                        <button class="btn btn-skip" onclick="跳过此题()">
+                            <i class="fas fa-forward"></i> 跳过
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 结果区域 -->
+                <div class="game-section" id="结果区域" style="display:none;">
+                    <div class="结果卡片">
+                        <div class="结果标题" id="结果标题">🎉 练习完成！</div>
+                        <div class="结果统计">
+                            <div class="结果项">
+                                <div class="结果数字" id="最终正确">0</div>
+                                <div class="结果标签">正确题数</div>
+                            </div>
+                            <div class="结果项">
+                                <div class="结果数字" id="最终用时">0</div>
+                                <div class="结果标签">总用时(秒)</div>
+                            </div>
+                            <div class="结果项">
+                                <div class="结果数字" id="正确率">0%</div>
+                                <div class="结果标签">正确率</div>
+                            </div>
+                        </div>
+                        <div class="start-btn-wrapper">
+                            <button class="start-btn" onclick="重新练习()">
+                                <i class="fas fa-redo"></i> 再练一次
+                            </button>
+                            <button class="start-btn secondary" onclick="返回设置()">
+                                <i class="fas fa-home"></i> 返回设置
+                            </button>
+                        </div>
+
+                        <!-- 错题本 -->
+                        <div class="错题本区域" id="错题本显示"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 错题本 -->
+            <div class="tab-content" id="错题">
+                <div class="settings-section">
+                    <h2><i class="fas fa-book"></i> 我的错题本</h2>
+                    <p id="错题统计">暂无错题记录，加油！</p>
+                    <div id="错题列表" class="错题列表"></div>
+                    <div class="start-btn-wrapper" style="margin-top:20px;">
+                        <button class="start-btn secondary" onclick="清空错题()">
+                            <i class="fas fa-trash"></i> 清空错题本
+                        </button>
+                        <button class="start-btn" onclick="练习错题()">
+                            <i class="fas fa-redo"></i> 专项练习错题
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习统计 -->
+            <div class="tab-content" id="统计">
+                <div class="settings-section">
+                    <h2><i class="fas fa-chart-bar"></i> 学习统计</h2>
+                    <div id="统计内容"></div>
+                    <div class="start-btn-wrapper" style="margin-top:20px;">
+                        <button class="start-btn secondary" onclick="重置数据()">
+                            <i class="fas fa-trash"></i> 重置所有数据
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 鼓掌动画 -->
+    <div class="applause" id="鼓掌">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+    </div>
+
+    <!-- 客服按钮 -->
+    <div class="customer-service">
+        <button class="cs-btn">
+            <i class="fas fa-headset"></i>
+        </button>
+    </div>
+
+    <script>
+        // 游戏状态
+        let 游戏状态 = {
+            题目列表: [],
+            当前题号: 0,
+            正确数: 0,
+            已答题数: 0,
+            总题数: 20,
+            错题列表: [],
+            开始时间: null,
+            计时器ID: null,
+            是否计时: false,
+            已保存做题数: 0,
+            已保存正确数: 0
+        };
+
+        // 数字范围配置
+        const 数字范围 = {
+            '10以内': { min: 1, max: 9 },
+            '20以内': { min: 1, max: 19 },
+            '50以内': { min: 1, max: 49 },
+            '100以内': { min: 1, max: 99 },
+            '1000以内': { min: 10, max: 999 },
+            '万以内': { min: 100, max: 9999 }
+        };
+
+        // 切换标签页
+        function 切换标签(标签名) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(标签名).classList.add('active');
+
+            if (标签名 === '错题') {
+                加载错题本();
+            } else if (标签名 === '统计') {
+                加载统计数据();
+            }
+        }
+
+        // 更新数字范围说明
+        function 更新数字范围() {
+            const 难度 = document.getElementById('难度级别').value;
+            console.log('当前难度:', 难度);
+        }
+
+        // 获取随机数
+        function 获取随机数(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // 生成题目
+        function 生成题目() {
+            const 难度 = document.getElementById('难度级别').value;
+            const 类型 = document.getElementById('运算类型').value;
+            const 范围 = 数字范围[难度];
+
+            let num1, num2, operator, answer;
+
+            if (类型 === '加减') {
+                const ops = ['+', '-'];
+                operator = ops[获取随机数(0, 1)];
+                
+                if (operator === '+') {
+                    num1 = 获取随机数(范围.min, Math.min(范围.max, 50));
+                    num2 = 获取随机数(范围.min, Math.min(范围.max, 50));
+                    answer = num1 + num2;
+                } else {
+                    num1 = 获取随机数(范围.min + 1, 范围.max);
+                    num2 = 获取随机数(范围.min, num1 - 1);
+                    answer = num1 - num2;
+                }
+            } else if (类型 === '乘除') {
+                const ops = ['×', '÷'];
+                operator = ops[获取随机数(0, 1)];
+                
+                if (operator === '×') {
+                    num1 = 获取随机数(2, 9);
+                    num2 = 获取随机数(2, 9);
+                    answer = num1 * num2;
+                } else {
+                    answer = 获取随机数(2, 9);
+                    num2 = 获取随机数(2, 9);
+                    num1 = answer * num2;
+                }
+            } else {
+                const ops = ['+', '-', '×', '÷'];
+                operator = ops[获取随机数(0, 3)];
+                
+                switch(operator) {
+                    case '+':
+                        num1 = 获取随机数(范围.min, Math.min(范围.max, 50));
+                        num2 = 获取随机数(范围.min, Math.min(范围.max, 50));
+                        answer = num1 + num2;
+                        break;
+                    case '-':
+                        num1 = 获取随机数(范围.min + 1, 范围.max);
+                        num2 = 获取随机数(范围.min, num1 - 1);
+                        answer = num1 - num2;
+                        break;
+                    case '×':
+                        num1 = 获取随机数(2, 9);
+                        num2 = 获取随机数(2, 9);
+                        answer = num1 * num2;
+                        break;
+                    case '÷':
+                        answer = 获取随机数(2, 9);
+                        num2 = 获取随机数(2, 9);
+                        num1 = answer * num2;
+                        break;
+                }
+            }
+
+            return {
+                num1,
+                num2,
+                operator,
+                answer,
+                text: `${num1} ${operator} ${num2} = ?`
+            };
+        }
+
+        // 开始练习
+        function 开始练习() {
+            const 数量 = parseInt(document.getElementById('题目数量').value);
+            const 是否计时 = document.getElementById('计时模式').value === '开启';
+
+            游戏状态 = {
+                题目列表: [],
+                当前题号: 0,
+                正确数: 0,
+                已答题数: 0,
+                总题数: 数量,
+                错题列表: [],
+                开始时间: Date.now(),
+                计时器ID: null,
+                是否计时: 是否计时,
+                已保存做题数: 0,
+                已保存正确数: 0
+            };
+
+            // 生成题目列表
+            for (let i = 0; i < 数量; i++) {
+                游戏状态.题目列表.push(生成题目());
+            }
+
+            // 切换显示
+            document.getElementById('settingsSection').style.display = 'none';
+            document.getElementById('gameSection').style.display = 'block';
+            document.getElementById('结果区域').style.display = 'none';
+
+            // 初始化计时器
+            if (是否计时) {
+                document.getElementById('计时器显示').style.display = 'block';
+                开始计时器();
+            } else {
+                document.getElementById('计时器显示').style.display = 'none';
+            }
+
+            显示当前题目();
+// 初始化练习次数
+const 旧数据 = 获取学习数据();
+const 记录 = {
+    总做题数: 旧数据.总做题数 || 0,
+    总正确数: 旧数据.总正确数 || 0,
+    练习次数: (旧数据.练习次数 || 0) + 1,
+    最后练习时间: ''
+};
+localStorage.setItem('口算练习_学习统计', JSON.stringify(记录));
+        }
+
+        // 随机练习
+        function 随机练习() {
+            const 难度列表 = ['10以内', '20以内', '50以内', '100以内'];
+            const 类型列表 = ['加减', '乘除', '混合'];
+            
+            document.getElementById('难度级别').value = 难度列表[获取随机数(0, 3)];
+            document.getElementById('运算类型').value = 类型列表[获取随机数(0, 2)];
+            document.getElementById('题目数量').value = '20';
+            document.getElementById('计时模式').value = '开启';
+
+            开始练习();
+        }
+
+        // 显示当前题目
+        function 显示当前题目() {
+            if (游戏状态.当前题号 >= 游戏状态.总题数) {
+                结束练习();
+                return;
+            }
+
+            const 题目 = 游戏状态.题目列表[游戏状态.当前题号];
+            document.getElementById('题号').textContent = `第 ${游戏状态.当前题号 + 1} 题`;
+            document.getElementById('算式显示').textContent = 题目.text;
+            document.getElementById('答案输入').value = '';
+            document.getElementById('答案输入').className = '答案输入';
+            document.getElementById('答案输入').focus();
+            document.getElementById('反馈').textContent = '';
+            document.getElementById('反馈').className = '反馈';
+            document.getElementById('正确答案提示').textContent = '';
+            document.getElementById('下一题按钮').style.display = 'none';
+            document.getElementById('已用时').textContent = Math.floor((Date.now() - 游戏状态.开始时间) / 1000);
+        }
+
+        // 提交答案
+        function 提交答案() {
+            const 用户答案 = parseInt(document.getElementById('答案输入').value);
+            const 题目 = 游戏状态.题目列表[游戏状态.当前题号];
+
+            if (isNaN(用户答案)) {
+                document.getElementById('反馈').textContent = '请输入答案！';
+                document.getElementById('反馈').className = '反馈 incorrect';
+                return;
+            }
+
+            游戏状态.已答题数++;
+
+            if (用户答案 === 题目.answer) {
+                // 正确
+                游戏状态.正确数++;
+                document.getElementById('答案输入').className = '答案输入 correct';
+                document.getElementById('反馈').textContent = '🎉 太棒了！';
+                document.getElementById('反馈').className = '反馈 correct';
+
+                // 鼓掌动画
+                const 鼓掌 = document.getElementById('鼓掌');
+                鼓掌.classList.add('show');
+                setTimeout(() => {
+                    鼓掌.classList.remove('show');
+                    游戏状态.当前题号++;
+                    显示当前题目();
+                }, 800);
+            } else {
+                // 错误
+                document.getElementById('答案输入').className = '答案输入 incorrect';
+                document.getElementById('反馈').textContent = '❌ 再想想！';
+                document.getElementById('反馈').className = '反馈 incorrect';
+                document.getElementById('正确答案提示').textContent = `正确答案：${题目.answer}`;
+
+                // 记录错题
+                游戏状态.错题列表.push({
+                    ...题目,
+                    userAnswer: 用户答案
+                });
+            }
+
+            document.getElementById('正确数').textContent = 游戏状态.正确数;
+            document.getElementById('总数').textContent = 游戏状态.已答题数;
+            document.getElementById('下一题按钮').style.display = 'inline-flex';
+            保存学习记录();
+        }
+
+        // 下一题
+        function 下一题() {
+            游戏状态.当前题号++;
+            显示当前题目();
+            保存学习记录();
+        }
+
+        // 跳过此题
+        function 跳过此题() {
+            const 题目 = 游戏状态.题目列表[游戏状态.当前题号];
+            游戏状态.已答题数++;
+            游戏状态.错题列表.push({
+                ...题目,
+                userAnswer: '跳过'
+            });
+            document.getElementById('总数').textContent = 游戏状态.已答题数;
+            
+            游戏状态.当前题号++;
+            显示当前题目();
+        }
+        // 检查回车
+        function 检查回车(event) {
+            if (event.key === 'Enter') {
+                if (document.getElementById('下一题按钮').style.display === 'none') {
+                    提交答案();
+                } else {
+                    下一题();
+                }
+            }
+        }
+
+        // 结束练习
+        function 结束练习() {
+            if (游戏状态.计时器ID) {
+                clearInterval(游戏状态.计时器ID);
+            }
+
+            const 用时 = Math.floor((Date.now() - 游戏状态.开始时间) / 1000);
+            const 正确率 = Math.round((游戏状态.正确数 / 游戏状态.总题数) * 100);
+
+            document.getElementById('gameSection').style.display = 'none';
+            document.getElementById('结果区域').style.display = 'block';
+
+            document.getElementById('最终正确').textContent = 游戏状态.正确数;
+            document.getElementById('最终用时').textContent = 用时;
+            document.getElementById('正确率').textContent = 正确率 + '%';
+
+            // 显示错题
+            const 错题显示 = document.getElementById('错题本显示');
+            if (游戏状态.错题列表.length > 0) {
+                错题显示.style.display = 'block';
+                错题显示.innerHTML = `
+                    <div class="错题本标题">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        本次错题（共${游戏状态.错题列表.length}题）
+                    </div>
+                    <div class="错题列表">
+                        ${游戏状态.错题列表.map((错题, i) => `
+                            <div class="错题项">
+                                <span>${i + 1}. ${错题.text}</span>
+                                <span class="错题答案">正确答案: ${错题.answer}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // 保存错题到本地
+                保存错题到本地();
+            } else {
+                错题显示.style.display = 'none';
+            }
+
+
+        }
+
+        // 重新练习
+        function 重新练习() {
+            开始练习();
+        }
+
+        // 返回设置
+        function 返回设置() {
+            document.getElementById('settingsSection').style.display = 'block';
+            document.getElementById('gameSection').style.display = 'none';
+            document.getElementById('结果区域').style.display = 'none';
+        }
+
+        // 计时器
+        function 开始计时器() {
+            if (游戏状态.计时器ID) {
+                clearInterval(游戏状态.计时器ID);
+            }
+            
+            const 开始时间 = Date.now();
+            const 计时器显示 = document.getElementById('计时器');
+            
+            游戏状态.计时器ID = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - 开始时间) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                计时器显示.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // 本地存储
+        function 保存学习记录() {
+            // 只保存增量（当前值 - 上次保存时的基准值）
+            const 新增做题 = 游戏状态.已答题数 - 游戏状态.已保存做题数;
+            const 新增正确 = 游戏状态.正确数 - 游戏状态.已保存正确数;
+            
+            if (新增做题 > 0) {
+                const 旧数据 = 获取学习数据();
+                const 记录 = {
+                    总做题数: (旧数据.总做题数 || 0) + 新增做题,
+                    总正确数: (旧数据.总正确数 || 0) + 新增正确,
+                    练习次数: 旧数据.练习次数 || 0,
+                    最后练习时间: new Date().toLocaleString()
+                };
+                localStorage.setItem('口算练习_学习统计', JSON.stringify(记录));
+                
+                // 更新基准值
+                游戏状态.已保存做题数 = 游戏状态.已答题数;
+                游戏状态.已保存正确数 = 游戏状态.正确数;
+            }
+        }
+
+        function 获取学习数据() {
+            const data = localStorage.getItem('口算练习_学习统计');
+            return data ? JSON.parse(data) : {};
+        }
+
+        function 保存错题到本地() {
+            const 现有错题 = 获取错题数据();
+            const 新错题 = [...现有错题, ...游戏状态.错题列表.filter(
+                新错 => !现有错题.some(旧错 => 
+                    旧错.num1 === 新错.num1 && 
+                    旧错.num2 === 新错.num2 && 
+                    旧错.operator === 新错.operator
+                )
+            )];
+            localStorage.setItem('口算练习_错题本', JSON.stringify(新错题.slice(-100)));
+        }
+
+        function 获取错题数据() {
+            const data = localStorage.getItem('口算练习_错题本');
+            return data ? JSON.parse(data) : [];
+        }
+
+        // 加载错题本
+        function 加载错题本() {
+            const 错题 = 获取错题数据();
+            const 列表容器 = document.getElementById('错题列表');
+            const 统计 = document.getElementById('错题统计');
+
+            if (错题.length === 0) {
+                列表容器.innerHTML = '<p style="text-align:center;color:#666;">暂无错题记录，继续加油！</p>';
+                统计.textContent = '暂无错题记录，继续加油！';
+                return;
+            }
+
+            统计.textContent = `共 ${错题.length} 道错题`;
+            列表容器.innerHTML = 错题.slice(-20).reverse().map((错题, i) => `
+                <div class="错题项">
+                    <span>${i + 1}. ${错题.text}</span>
+                    <span class="错题答案">${错题.answer}</span>
+                </div>
+            `).join('');
+        }
+
+        // 练习错题
+        function 练习错题() {
+            const 错题 = 获取错题数据();
+            if (错题.length === 0) {
+                alert('暂无错题！');
+                return;
+            }
+
+            游戏状态 = {
+                题目列表: 错题.slice(-20),
+                当前题号: 0,
+                正确数: 0,
+                已答题数: 0,
+                总题数: Math.min(错题.length, 20),
+                错题列表: [],
+                开始时间: Date.now(),
+                计时器ID: null,
+                是否计时: true
+            };
+
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector('.nav-tab').classList.add('active');
+            document.getElementById('练习').classList.add('active');
+
+            document.getElementById('settingsSection').style.display = 'none';
+            document.getElementById('gameSection').style.display = 'block';
+            document.getElementById('结果区域').style.display = 'none';
+            document.getElementById('计时器显示').style.display = 'block';
+            
+            开始计时器();
+            显示当前题目();
+        }
+
+        // 清空错题
+        function 清空错题() {
+            if (confirm('确定要清空错题本吗？')) {
+                localStorage.removeItem('口算练习_错题本');
+                加载错题本();
+            }
+        }
+
+        // 加载统计数据
+        function 加载统计数据() {
+            const 数据 = 获取学习数据();
+            const 统计容器 = document.getElementById('统计内容');
+
+            if (!数据.练习次数) {
+                统计容器.innerHTML = '<p style="text-align:center;color:#666;">暂无学习记录，开始练习吧！</p>';
+                return;
+            }
+
+            const 总正确率 = 数据.总做题数 > 0 ? Math.round((数据.总正确数 / 数据.总做题数) * 100) : 0;
+
+            统计容器.innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;">
+                    <div class="stat-box" style="text-align:center;">
+                        <div style="font-size:2rem;font-weight:bold;color:#667eea;">${数据.练习次数}</div>
+                        <div>练习次数</div>
+                    </div>
+                    <div class="stat-box" style="text-align:center;">
+                        <div style="font-size:2rem;font-weight:bold;color:#38ef7d;">${数据.总做题数}</div>
+                        <div>总做题数</div>
+                    </div>
+                    <div class="stat-box" style="text-align:center;">
+                        <div style="font-size:2rem;font-weight:bold;color:#f5576c;">${数据.总正确数}</div>
+                        <div>总正确数</div>
+                    </div>
+                    <div class="stat-box" style="text-align:center;">
+                        <div style="font-size:2rem;font-weight:bold;color:#667eea;">${总正确率}%</div>
+                        <div>总正确率</div>
+                    </div>
+                </div>
+                <p style="text-align:center;color:#666;margin-top:15px;">
+                    最后练习：${数据.最后练习时间 || '暂无'}
+                </p>
+            `;
+        }
+
+        // 重置数据
+        function 重置数据() {
+            if (confirm('确定要重置所有学习数据吗？此操作不可恢复！')) {
+                localStorage.removeItem('口算练习_学习统计');
+                localStorage.removeItem('口算练习_错题本');
+                加载统计数据();
+                加载错题本();
+                alert('数据已重置！');
+            }
+        }
+
+        // 初始化
+        window.addEventListener('load', function() {
+            加载统计数据();
+        });
+    </script>
+</body>
+</html>
