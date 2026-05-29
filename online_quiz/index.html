@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>六下数学基础默写</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #647084;
+      --line: #d8e1ea;
+      --blue: #1d63c2;
+      --green: #197b55;
+      --red: #b33a3a;
+      --amber: #a96a00;
+      --bg: #f4f7fb;
+      --paper: #fffdf8;
+      --panel: #ffffff;
+      --shadow: 0 18px 46px rgba(31, 45, 61, .12);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: linear-gradient(90deg, rgba(29, 99, 194, .08), rgba(25, 123, 85, .08)), var(--bg);
+    }
+
+    button,
+    input,
+    select { font: inherit; }
+
+    .shell {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 36px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 42px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .score {
+      min-width: 150px;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .9);
+      box-shadow: 0 8px 20px rgba(31, 45, 61, .08);
+      text-align: center;
+    }
+
+    .score strong {
+      display: block;
+      color: var(--blue);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .score span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tools {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 8px 20px rgba(31, 45, 61, .08);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .quiz-panel,
+    .source-panel,
+    .records-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .quiz-panel {
+      padding: 16px;
+    }
+
+    .notice {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(179, 58, 58, .42);
+      border-left: 4px solid var(--red);
+      border-radius: 8px;
+      background: #fff7f5;
+      color: #5f2525;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .notice.show {
+      display: block;
+    }
+
+    .notice strong {
+      color: var(--red);
+    }
+
+    .notice ul {
+      margin: 6px 0 0;
+      padding-left: 20px;
+    }
+
+    .set {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .set:last-child { margin-bottom: 0; }
+
+    .set-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fbff;
+    }
+
+    .set-title {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .set-meta {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      margin: 8px 0 0;
+      color: var(--blue);
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .question {
+      display: grid;
+      gap: 10px;
+      min-height: 176px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .question.correct { border-color: rgba(29, 99, 194, .65); background: #f1f7ff; }
+    .question.wrong { border-color: rgba(179, 58, 58, .55); background: #fff7f5; }
+    .question.empty { border-color: rgba(169, 106, 0, .55); background: #fffaf0; }
+
+    .question.correct .qno { background: var(--blue); }
+    .question.wrong .qno { background: var(--red); }
+    .question.correct .answer-box { border-color: rgba(29, 99, 194, .72); }
+    .question.wrong .answer-box { border-color: rgba(179, 58, 58, .72); }
+
+    .qline {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .qno {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--ink);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .qtext {
+      min-width: 0;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .answer-box {
+      width: 100%;
+      min-height: 42px;
+      border: 2px solid #c8d4e2;
+      border-radius: 8px;
+      padding: 9px 11px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .answer-box:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(29, 99, 194, .16);
+    }
+
+    .feedback {
+      display: none;
+      padding: 10px 12px;
+      border-left: 4px solid var(--blue);
+      border-radius: 6px;
+      background: #eef5ff;
+      color: #26364d;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .feedback strong { color: var(--ink); }
+    .submitted .feedback { display: block; }
+    .submitted .wrong .feedback {
+      border-left-color: var(--red);
+      background: #fff0ee;
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 14px 0 0;
+      background: linear-gradient(rgba(255,255,255,0), var(--panel) 22%);
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+      min-height: 21px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      color: #fff;
+      background: var(--blue);
+      font-weight: 800;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(29, 99, 194, .2);
+    }
+
+    .btn.secondary {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .side-stack {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .source-panel,
+    .records-panel {
+      overflow: hidden;
+    }
+
+    .source-panel header,
+    .records-panel header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fbff;
+    }
+
+    .source-panel h2,
+    .records-panel h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .source-panel a,
+    .records-panel button {
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .records-panel button {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .records-list {
+      display: grid;
+      gap: 10px;
+      max-height: 360px;
+      overflow: auto;
+      padding: 12px;
+      background: #fbfcfe;
+    }
+
+    .record-empty {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .record {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .record summary {
+      cursor: pointer;
+      padding: 10px 12px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .record small {
+      display: block;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .record ol {
+      margin: 0;
+      padding: 0 12px 12px 32px;
+      color: #334155;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .source-image {
+      max-height: 720px;
+      overflow: auto;
+      background: #f0f3f7;
+    }
+
+    .source-image img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .side-stack { position: static; }
+      .source-image { max-height: 540px; }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 20px, 1280px);
+        padding-top: 18px;
+      }
+
+      .topbar,
+      .tools,
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .score,
+      .button-row,
+      .btn,
+      select { width: 100%; }
+
+      .question-grid { grid-template-columns: 1fr; }
+
+      .set-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="topbar" aria-label="答题概览">
+      <div>
+        <h1>六下数学基础默写</h1>
+        <p class="subtitle">一次只显示一张小纸条。每张单独提交，提交后保存本地答题记录。</p>
+      </div>
+      <div class="score" aria-live="polite">
+        <strong id="scoreText">0/12</strong>
+        <span id="scoreLabel">待提交</span>
+      </div>
+    </section>
+
+    <section class="tools" aria-label="选择小纸条和操作">
+      <div class="filters">
+        <select id="setFilter" aria-label="选择小纸条">
+        </select>
+      </div>
+      <div class="button-row">
+        <button class="btn secondary" id="resetBtn" type="button">重做</button>
+        <button class="btn" id="submitBtn" type="button">提交本张小纸条</button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="quiz-panel" id="quizPanel">
+        <div class="notice" id="notice" role="alert" aria-live="assertive"></div>
+        <div id="quiz"></div>
+        <div class="actions">
+          <div class="status" id="statusText" aria-live="polite">已完成 0 题</div>
+          <div class="button-row">
+            <button class="btn secondary" id="scrollTopBtn" type="button">回到顶部</button>
+            <button class="btn" id="submitBtnBottom" type="button">提交本张小纸条</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <aside class="source-panel" aria-label="原卷参考">
+          <header>
+            <h2>原卷参考</h2>
+            <a href="assets/source.pdf" target="_blank" rel="noreferrer">打开 PDF</a>
+          </header>
+          <div class="source-image">
+            <img id="sourceImage" src="assets/page-01.png" alt="原卷题目页">
+          </div>
+        </aside>
+
+        <aside class="records-panel" aria-label="答题记录">
+          <header>
+            <h2>答题记录</h2>
+            <button id="clearRecordsBtn" type="button">清空</button>
+          </header>
+          <div class="records-list" id="recordsList"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const sets = [
+      {
+        id: "set1",
+        title: "小纸条 1",
+        source: "assets/page-01.png",
+        sectionTitles: {
+          "计算题": "一、计算题",
+          "简便/脱式/递等式": "二、简便运算",
+          "图形/应用题": "三、看图列方程并解答。"
+        },
+        items: [
+          ["计算题", "26 × 50 =", "1300", "26 × 50 = 26 × 5 × 10 = 130 × 10 = 1300。"],
+          ["计算题", "12 - 0.86 =", "11.14", "12 = 11 + 1，1 - 0.86 = 0.14，所以结果是 11.14。"],
+          ["计算题", "11 - 3/11 =", "10 8/11|10又8/11|118/11", "11 = 10 + 11/11，11/11 - 3/11 = 8/11，结果是 10又8/11。"],
+          ["计算题", "0.24 ÷ 6 =", "0.04", "24 ÷ 6 = 4，小数点向左移动两位，得 0.04。"],
+          ["计算题", "4 ÷ 2/5 =", "10", "除以 2/5 等于乘 5/2，4 × 5/2 = 10。"],
+          ["计算题", "24 × (1/4 + 1/6) =", "10", "用分配律：24×1/4 + 24×1/6 = 6 + 4 = 10。"],
+          ["计算题", "2.5 × 3.6 × 0.4 =", "3.6", "先算 2.5 × 0.4 = 1，再乘 3.6，结果是 3.6。"],
+          ["计算题", "96 × 0.4 ÷ 96 × 0.4 =", "0.16", "乘除同级从左往右算：(96×0.4÷96)×0.4 = 0.4×0.4 = 0.16。"],
+          ["简便/脱式/递等式", "59 × 101", "5959", "把 101 看成 100+1，59×101 = 59×100 + 59 = 5959。"],
+          ["简便/脱式/递等式", "24 × (1/4 + 5/6 - 7/8)", "5", "分配律：24×1/4 + 24×5/6 - 24×7/8 = 6 + 20 - 21 = 5。"],
+          ["简便/脱式/递等式", "275 + 450 ÷ 18 × 25", "900", "先乘除：450÷18=25，25×25=625，再算 275+625=900。"],
+          ["图形/应用题", "看图列方程：今年产量 20 吨，比去年增产 20%，去年产量是多少吨？", "50/3|16 2/3|16又2/3", "设去年产量为 x 吨，(1+20%)x=20，1.2x=20，x=50/3=16又2/3。"]
+        ]
+      },
+      {
+        id: "set2",
+        title: "小纸条 2",
+        source: "assets/page-01.png",
+        sectionTitles: {
+          "计算题": "一、计算题",
+          "简便/脱式/递等式": "二、递等式计算。",
+          "图形/应用题": "三、计算下面各圆锥的体积。"
+        },
+        items: [
+          ["计算题", "1 + 1% =", "1.01", "1% = 0.01，所以 1 + 0.01 = 1.01。"],
+          ["计算题", "3.14 × 0.5 =", "1.57", "乘 0.5 就是求一半，3.14 的一半是 1.57。"],
+          ["计算题", "0.1 ÷ 0.1 ÷ 0.01 =", "100", "从左往右算：0.1÷0.1=1，1÷0.01=100。"],
+          ["计算题", "5 ÷ 5/6 - 5/6 ÷ 5 =", "5 5/6|5又5/6|35/6", "5÷5/6=6，5/6÷5=1/6，6-1/6=5又5/6。"],
+          ["计算题", "0.3² - 0.2² =", "0.05", "0.3²=0.09，0.2²=0.04，差是 0.05。"],
+          ["计算题", "4/9 ÷ 4 =", "1/9", "4/9÷4 = 4/9×1/4 = 1/9。"],
+          ["计算题", "3/8 - 3/8 × 0.8 =", "3/40|0.075", "先乘法，也可提公因数：3/8×(1-0.8)=3/8×0.2=3/40。"],
+          ["计算题", "0.15 : 0.3 =", "0.5|1/2", "比号可看作除号，0.15÷0.3=0.5。"],
+          ["简便/脱式/递等式", "4.25 ÷ (4/5 × 3/8 + 4.7)", "0.85", "括号内 4/5×3/8=0.3，0.3+4.7=5，4.25÷5=0.85。"],
+          ["简便/脱式/递等式", "7/16 × 5/11 ÷ 7/8", "5/22", "除以 7/8 等于乘 8/7，约去 7 和 16 中的公因数后得 5/22。"],
+          ["简便/脱式/递等式", "48 × (1 3/4 + 1/6 - 5/8)", "62", "分配律：48×7/4 + 48×1/6 - 48×5/8 = 84 + 8 - 30 = 62。"],
+          ["图形/应用题", "圆锥体积：底面半径 4 cm，高 12 cm。", "200.96", "V=1/3πr²h，1/3×3.14×4²×12=200.96 cm³。"],
+          ["图形/应用题", "圆锥体积：底面直径 4 cm，高 5.4 cm。", "22.608", "半径 4÷2=2，V=1/3×3.14×2²×5.4=22.608 cm³。"]
+        ]
+      },
+      {
+        id: "set3",
+        title: "小纸条 3",
+        source: "assets/page-02.png",
+        sectionTitles: {
+          "计算题": "一、计算题",
+          "简便/脱式/递等式": "二、脱式计算",
+          "图形/应用题": "三、计算圆柱的表面积。（单位：cm）"
+        },
+        items: [
+          ["计算题", "198 + 236 =", "434", "198+236=434。"],
+          ["计算题", "2/7 ÷ 0.4 =", "5/7", "0.4=2/5，2/7÷2/5=2/7×5/2=5/7。"],
+          ["计算题", "16 × 3/8 =", "6", "16÷8=2，2×3=6。"],
+          ["计算题", "4/9 + 5/9 × 1/2 =", "13/18", "先乘法：5/9×1/2=5/18，4/9=8/18，和为 13/18。"],
+          ["计算题", "3.02 - 0.2 =", "2.82", "小数点对齐相减，3.02-0.20=2.82。"],
+          ["计算题", "0.3² =", "0.09", "0.3×0.3=0.09。"],
+          ["计算题", "63 ÷ 7/9 =", "81", "除以 7/9 等于乘 9/7，63×9/7=81。"],
+          ["计算题", "5/7 × 3/4 ÷ 5/7 × 3/4 =", "9/16", "乘除同级从左往右算，前面的 5/7 与 ÷5/7 抵消，剩 3/4×3/4=9/16。"],
+          ["简便/脱式/递等式", "59 × 101", "5959", "59×(100+1)=5900+59=5959。"],
+          ["简便/脱式/递等式", "4 × 2/7 + 4 × 5/7", "4", "提取公因数 4：4×(2/7+5/7)=4×1=4。"],
+          ["简便/脱式/递等式", "4/5 × [5/6 ÷ (7/9 - 1/3)]", "3/2|1 1/2|1又1/2", "7/9-1/3=4/9，5/6÷4/9=15/8，再乘 4/5 得 3/2。"],
+          ["图形/应用题", "圆柱表面积：底面直径 3 cm，高 4 cm。", "51.81", "半径 1.5，S=2πr²+2πrh=2×3.14×1.5²+2×3.14×1.5×4=51.81 cm²。"],
+          ["图形/应用题", "圆柱表面积：底面半径 6 cm，高 15 cm。", "791.28", "S=2πr²+2πrh=2×3.14×6²+2×3.14×6×15=791.28 cm²。"]
+        ]
+      },
+      {
+        id: "set4",
+        title: "小纸条 4",
+        source: "assets/page-02.png",
+        sectionTitles: {
+          "计算题": "一、计算题",
+          "简便/脱式/递等式": "二、简便运算",
+          "图形/应用题": "三、求下面圆柱的侧面积。（单位：cm）"
+        },
+        items: [
+          ["计算题", "28 × 301% ≈", "90", "估算时 28≈30，301%≈3，所以约等于 30×3=90。"],
+          ["计算题", "1 - 5/8 =", "3/8", "1=8/8，8/8-5/8=3/8。"],
+          ["计算题", "425 - 199 =", "226", "减 199 可看成减 200 再加 1，425-200+1=226。"],
+          ["计算题", "557 ÷ 69 ≈", "8", "估算 557≈560，69≈70，560÷70=8。"],
+          ["计算题", "5.2 ÷ 0.125 ÷ 8 =", "5.2", "从左往右：5.2÷0.125=41.6，41.6÷8=5.2。"],
+          ["计算题", "2/7 ÷ 7/2 =", "4/49", "2/7÷7/2=2/7×2/7=4/49。"],
+          ["计算题", "1/2 + 1/3 =", "5/6", "通分为六分之几：3/6+2/6=5/6。"],
+          ["计算题", "8.2 - 2 =", "6.2", "8.2-2=6.2。"],
+          ["计算题", "7 - 2/7 =", "6 5/7|6又5/7|47/7", "7=6+7/7，7/7-2/7=5/7，结果 6又5/7。"],
+          ["计算题", "3/4 × 0 + 3 =", "3", "任何数乘 0 得 0，0+3=3。"],
+          ["简便/脱式/递等式", "7/12 ÷ (5/8 + 2/3 × 3/8)", "2/3", "先算 2/3×3/8=1/4，5/8+1/4=7/8，7/12÷7/8=2/3。"],
+          ["简便/脱式/递等式", "10.15 - 6.25 - 3.75 + 8.85", "9", "重组：(10.15+8.85)-(6.25+3.75)=19-10=9。"],
+          ["简便/脱式/递等式", "(5/12 + 1/19) × 12 + 7/19", "6", "5/12×12=5，1/19×12+7/19=19/19=1，总和 6。"],
+          ["图形/应用题", "圆柱侧面积：底面直径 8 cm，高 10 cm。", "251.2", "侧面积=底面周长×高=3.14×8×10=251.2 cm²。"]
+        ]
+      },
+      {
+        id: "set5",
+        title: "小纸条 5",
+        source: "assets/page-03.png",
+        sectionTitles: {
+          "计算题": "一、计算题",
+          "简便/脱式/递等式": "二、简便运算",
+          "图形/应用题": "16. 一个半圆柱如图所示，求它的表面积和体积。"
+        },
+        items: [
+          ["计算题", "5/12 × 0.6 =", "1/4|0.25", "0.6=3/5，5/12×3/5=3/12=1/4。"],
+          ["计算题", "3.6 × 2/9 =", "0.8|4/5", "3.6÷9=0.4，0.4×2=0.8。"],
+          ["计算题", "1.8 ÷ 3/7 =", "4.2", "除以 3/7 等于乘 7/3，1.8×7÷3=4.2。"],
+          ["计算题", "8/15 ÷ 40 =", "1/75", "8/15÷40=8/15×1/40，约分得 1/75。"],
+          ["计算题", "0.6 ÷ 0.6% =", "100", "0.6%=0.006，0.6÷0.006=100。"],
+          ["计算题", "(2/3 - 1/4) × 24 =", "10", "2/3-1/4=5/12，5/12×24=10。"],
+          ["计算题", "2.4 + 7.6 ÷ 4 =", "4.3", "先除法：7.6÷4=1.9，再加 2.4 得 4.3。"],
+          ["计算题", "1/3 + 1/4 ÷ 1/4 + 1/3 =", "5/3|1 2/3|1又2/3", "先算 1/4÷1/4=1，再算 1/3+1+1/3=5/3。"],
+          ["简便/脱式/递等式", "63.7 - 5.8 - 4.2", "53.7", "连续减两个数，可减它们的和：63.7-(5.8+4.2)=53.7。"],
+          ["简便/脱式/递等式", "6/7 × 1/11 + 1/7 ÷ 11", "1/11", "1/7÷11=1/7×1/11，提取 1/11，得 (6/7+1/7)×1/11=1/11。"],
+          ["简便/脱式/递等式", "(7/12 + 3/8 + 23/24) × 24", "46", "分配律：7/12×24 + 3/8×24 + 23/24×24 = 14+9+23=46。"],
+          ["图形/应用题", "半圆柱：长 20 cm，底面直径 12 cm，求表面积和体积。", "729.84,1130.4|729.84 1130.4", "半径 6。体积=1/2×3.14×6²×20=1130.4；表面积=半个侧面+长方形切面+两个半圆=376.8+240+113.04=729.84。"]
+        ]
+      },
+      {
+        id: "set6",
+        title: "小纸条 6",
+        source: "assets/page-03.png",
+        sectionTitles: {
+          "计算题": "一、计算题",
+          "简便/脱式/递等式": "二、简便运算",
+          "图形/应用题": "三、根据给出的公式计算下面各圆柱的体积。"
+        },
+        items: [
+          ["计算题", "1/4 - 1/5 =", "1/20", "通分：5/20-4/20=1/20。"],
+          ["计算题", "8.2 + 0.08 =", "8.28", "小数点对齐相加，8.20+0.08=8.28。"],
+          ["计算题", "8.1 ÷ 3% =", "270", "3%=0.03，8.1÷0.03=270。"],
+          ["计算题", "3/4 × 0.25 =", "3/16|0.1875", "0.25=1/4，3/4×1/4=3/16。"],
+          ["计算题", "6 - 6 ÷ 9 =", "5 1/3|5又1/3|16/3", "先算 6÷9=2/3，6-2/3=5又1/3。"],
+          ["计算题", "10 ÷ 5/6 =", "12", "除以 5/6 等于乘 6/5，10×6/5=12。"],
+          ["计算题", "1 ÷ 1/7 - 3/7 ÷ 1 =", "6 4/7|6又4/7|46/7", "先算 1÷1/7=7，3/7÷1=3/7，7-3/7=6又4/7。"],
+          ["计算题", "3/5 × 6 ÷ 3/5 × 6 =", "36", "乘除同级从左往右算，3/5×6÷3/5=6，再乘 6 得 36。"],
+          ["简便/脱式/递等式", "156 + 28 + 72 + 44", "300", "凑整：(156+44)+(28+72)=200+100=300。"],
+          ["简便/脱式/递等式", "15.28 - 3.9 - 6.1", "5.28", "连续减：15.28-(3.9+6.1)=15.28-10=5.28。"],
+          ["简便/脱式/递等式", "12.5 × 8 ÷ 12.5 × 8", "64", "从左往右，12.5×8÷12.5=8，再乘 8 得 64。"],
+          ["图形/应用题", "圆柱体积：底面直径 10 cm，高 15 cm。", "1177.5", "半径 5，V=πr²h=3.14×5²×15=1177.5 cm³。"],
+          ["图形/应用题", "圆柱体积：底面半径 3 cm，高 12 cm。", "339.12", "V=πr²h=3.14×3²×12=339.12 cm³。"]
+        ]
+      }
+    ];
+
+    const quiz = document.querySelector("#quiz");
+    const quizPanel = document.querySelector("#quizPanel");
+    const setFilter = document.querySelector("#setFilter");
+    const sourceImage = document.querySelector("#sourceImage");
+    const scoreText = document.querySelector("#scoreText");
+    const scoreLabel = document.querySelector("#scoreLabel");
+    const statusText = document.querySelector("#statusText");
+    const notice = document.querySelector("#notice");
+    const submitBtn = document.querySelector("#submitBtn");
+    const submitBtnBottom = document.querySelector("#submitBtnBottom");
+    const resetBtn = document.querySelector("#resetBtn");
+    const scrollTopBtn = document.querySelector("#scrollTopBtn");
+    const recordsList = document.querySelector("#recordsList");
+    const clearRecordsBtn = document.querySelector("#clearRecordsBtn");
+    const recordKey = "grade6_math_slips_records_v1";
+
+    sets.forEach((set) => {
+      const option = document.createElement("option");
+      option.value = set.id;
+      option.textContent = set.title;
+      setFilter.appendChild(option);
+    });
+    setFilter.value = sets[0].id;
+
+    function normalize(value) {
+      return String(value)
+        .trim()
+        .replace(/[，。；：]/g, "")
+        .replace(/[（）()]/g, "")
+        .replace(/\s+/g, " ")
+        .replace(/＋/g, "+")
+        .replace(/－/g, "-")
+        .replace(/／/g, "/")
+        .replace(/又/g, " ")
+        .replace(/cm³|cm\^3|立方厘米|cm²|cm\^2|平方厘米|吨/g, "")
+        .replace(/,/g, " ")
+        .toLowerCase();
+    }
+
+    function isCorrect(inputValue, answerString) {
+      const value = normalize(inputValue);
+      if (!value) return false;
+      return String(answerString).split("|").map(normalize).includes(value);
+    }
+
+    function clearNotice() {
+      notice.classList.remove("show");
+      notice.innerHTML = "";
+    }
+
+    function showUnansweredNotice(unanswered) {
+      notice.innerHTML = `
+        <strong>还有 ${unanswered.length} 题未作答，暂不能提交。</strong>
+        <ul>
+          ${unanswered.map((item) => `<li>${item.number}：${item.question}</li>`).join("")}
+        </ul>
+      `;
+      notice.classList.add("show");
+      notice.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function getSectionTitle(set, type) {
+      return set.sectionTitles[type] || type;
+    }
+
+    function renderQuiz() {
+      const selectedSet = setFilter.value;
+      const set = sets.find((entry) => entry.id === selectedSet) || sets[0];
+      setFilter.value = set.id;
+      quizPanel.classList.remove("submitted");
+      clearNotice();
+      quiz.innerHTML = "";
+
+      const section = document.createElement("section");
+      section.className = "set";
+      section.dataset.set = set.id;
+      section.innerHTML = `
+        <header class="set-header">
+          <h2 class="set-title">${set.title}</h2>
+          <span class="set-meta">${set.items.length} 题，本张单独提交</span>
+        </header>
+      `;
+
+      const grouped = {};
+      set.items.forEach((item, index) => {
+        const type = item[0];
+        if (!grouped[type]) grouped[type] = [];
+        grouped[type].push({ item, index });
+      });
+
+      Object.entries(grouped).forEach(([type, entries]) => {
+        const fullTitle = getSectionTitle(set, type);
+        const title = document.createElement("div");
+        title.className = "section-title";
+        title.textContent = fullTitle;
+        section.appendChild(title);
+
+        const grid = document.createElement("div");
+        grid.className = "question-grid";
+        entries.forEach(({ item, index }) => {
+          const number = `${sets.indexOf(set) + 1}-${index + 1}`;
+          const card = document.createElement("article");
+          card.className = "question";
+          card.dataset.answer = item[2];
+          card.dataset.set = set.id;
+          card.dataset.type = item[0];
+          card.dataset.question = item[1];
+          card.dataset.number = number;
+          card.innerHTML = `
+            <div class="qline">
+              <div class="qno">${number}</div>
+              <div class="qtext">${item[1]}</div>
+            </div>
+            <input class="answer-box" autocomplete="off" aria-label="${number} 答案" placeholder="输入答案">
+            <div class="feedback"><strong>答案：${item[2].split("|")[0]}。</strong> 解析：${item[3]}</div>
+          `;
+          grid.appendChild(card);
+        });
+        section.appendChild(grid);
+      });
+
+      quiz.appendChild(section);
+      bindInputs();
+      updateProgress();
+      updateSource();
+      scoreText.textContent = `0/${currentQuestions().length}`;
+      scoreLabel.textContent = "待提交";
+    }
+
+    function currentQuestions() {
+      return [...document.querySelectorAll(".question")];
+    }
+
+    function bindInputs() {
+      document.querySelectorAll(".answer-box").forEach((input) => {
+        input.addEventListener("input", () => {
+          input.closest(".question").classList.remove("correct", "wrong", "empty");
+          quizPanel.classList.remove("submitted");
+          scoreText.textContent = `0/${currentQuestions().length}`;
+          scoreLabel.textContent = "待提交";
+          clearNotice();
+          updateProgress();
+        });
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            const inputs = [...document.querySelectorAll(".answer-box")];
+            const next = inputs[inputs.indexOf(input) + 1];
+            if (next) next.focus();
+            else submitQuiz();
+          }
+        });
+      });
+    }
+
+    function updateProgress() {
+      const questions = currentQuestions();
+      const completed = questions.filter((q) => q.querySelector("input").value.trim()).length;
+      statusText.textContent = `当前小纸条 ${questions.length} 题，已完成 ${completed} 题`;
+    }
+
+    function updateSource() {
+      const selectedSet = setFilter.value;
+      const set = sets.find((entry) => entry.id === selectedSet) || sets[0];
+      sourceImage.src = set.source;
+    }
+
+    function loadRecords() {
+      try {
+        return JSON.parse(localStorage.getItem(recordKey) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveRecords(records) {
+      try {
+        localStorage.setItem(recordKey, JSON.stringify(records.slice(0, 50)));
+      } catch {
+        return false;
+      }
+      return true;
+    }
+
+    function renderRecords() {
+      const records = loadRecords();
+      recordsList.innerHTML = "";
+
+      if (!records.length) {
+        recordsList.innerHTML = '<p class="record-empty">还没有提交记录。每完成一张小纸条并提交后，这里会保存得分和作答情况。</p>';
+        return;
+      }
+
+      records.forEach((record) => {
+        const detail = document.createElement("details");
+        detail.className = "record";
+        const time = new Date(record.createdAt).toLocaleString("zh-CN", { hour12: false });
+        detail.innerHTML = `
+          <summary>${record.setTitle}：${record.score}/${record.total}<small>${time}</small></summary>
+          <ol>
+            ${record.answers.map((answer) => `
+              <li>${answer.correct ? "对" : "错"}｜${answer.question}｜作答：${answer.value || "未答"}</li>
+            `).join("")}
+          </ol>
+        `;
+        recordsList.appendChild(detail);
+      });
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      const questions = currentQuestions();
+      const set = sets.find((entry) => entry.id === setFilter.value) || sets[0];
+      const answers = [];
+      const unanswered = questions
+        .filter((question) => !question.querySelector("input").value.trim())
+        .map((question) => ({
+          number: question.dataset.number,
+          question: question.dataset.question
+        }));
+
+      if (unanswered.length) {
+        quizPanel.classList.remove("submitted");
+        questions.forEach((question) => {
+          question.classList.remove("correct", "wrong", "empty");
+          if (!question.querySelector("input").value.trim()) {
+            question.classList.add("empty");
+          }
+        });
+        showUnansweredNotice(unanswered);
+        updateProgress();
+        return;
+      }
+
+      clearNotice();
+      quizPanel.classList.add("submitted");
+
+      questions.forEach((question) => {
+        const input = question.querySelector("input");
+        const value = input.value.trim();
+        const correct = isCorrect(value, question.dataset.answer);
+        question.classList.remove("correct", "wrong", "empty");
+        if (correct) {
+          score += 1;
+          question.classList.add("correct");
+        } else {
+          question.classList.add("wrong");
+        }
+        answers.push({
+          question: question.dataset.question,
+          value,
+          correct,
+          answer: question.dataset.answer.split("|")[0]
+        });
+      });
+
+      scoreText.textContent = `${score}/${questions.length}`;
+      scoreLabel.textContent = "本张得分";
+      const records = loadRecords();
+      records.unshift({
+        setId: set.id,
+        setTitle: set.title,
+        score,
+        total: questions.length,
+        createdAt: new Date().toISOString(),
+        answers
+      });
+      if (!saveRecords(records)) {
+        scoreLabel.textContent = "本张得分，记录未保存";
+      }
+      renderRecords();
+      updateProgress();
+    }
+
+    function resetQuiz() {
+      quizPanel.classList.remove("submitted");
+      clearNotice();
+      currentQuestions().forEach((question) => {
+        question.classList.remove("correct", "wrong", "empty");
+        question.querySelector("input").value = "";
+      });
+      scoreText.textContent = `0/${currentQuestions().length}`;
+      scoreLabel.textContent = "待提交";
+      updateProgress();
+    }
+
+    setFilter.addEventListener("change", renderQuiz);
+    submitBtn.addEventListener("click", submitQuiz);
+    submitBtnBottom.addEventListener("click", submitQuiz);
+    resetBtn.addEventListener("click", resetQuiz);
+    scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    clearRecordsBtn.addEventListener("click", () => {
+      if (!loadRecords().length) return;
+      if (confirm("确定清空所有本地答题记录吗？")) {
+        try {
+          localStorage.removeItem(recordKey);
+        } catch {}
+        renderRecords();
+      }
+    });
+
+    renderQuiz();
+    renderRecords();
+  </script>
+</body>
+</html>
