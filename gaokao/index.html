@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最后一程，稳稳向前</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #697386;
+      --line: #dfe6f1;
+      --blue: #1e6bff;
+      --blue-dark: #1553c7;
+      --green: #0f8a63;
+      --shadow: 0 18px 48px rgba(23, 32, 51, .13);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    body { overflow: hidden; }
+    button, select { font: inherit; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 278px minmax(0, 1fr);
+      height: 100vh;
+      background: var(--bg);
+    }
+
+    .app.sidebar-collapsed { grid-template-columns: minmax(0, 1fr); }
+
+    .sidebar {
+      min-width: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .app.sidebar-collapsed .sidebar { display: none; }
+
+    .brand {
+      padding: 18px 16px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tools {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fbff;
+    }
+
+    .btn {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    }
+
+    .btn:hover {
+      border-color: #b7c6dd;
+      background: #f7faff;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn.primary,
+    .btn.play {
+      border-color: var(--blue);
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .btn.primary:hover,
+    .btn.play:hover {
+      border-color: var(--blue-dark);
+      background: var(--blue-dark);
+    }
+
+    .btn.play {
+      min-height: 46px;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .control-group {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .group-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .btn-row,
+    .print-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .thumbs {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .thumb {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      text-align: left;
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .thumb:hover {
+      border-color: #b4c3d8;
+      background: #f7faff;
+    }
+
+    .thumb.active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(30, 107, 255, .16);
+    }
+
+    .thumb img {
+      width: 90px;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 6px;
+      background: #edf2f7;
+    }
+
+    .thumb span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .stage {
+      position: relative;
+      min-width: 0;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      background: linear-gradient(180deg, #f7faff 0%, #eef4fb 100%);
+    }
+
+    .open-sidebar {
+      position: absolute;
+      z-index: 10;
+      top: 14px;
+      left: 14px;
+      display: none;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 12px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .92);
+      box-shadow: 0 10px 26px rgba(23, 32, 51, .14);
+      cursor: pointer;
+    }
+
+    .app.sidebar-collapsed .open-sidebar {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      min-height: 54px;
+      padding: 10px 18px;
+    }
+
+    .topline strong {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .viewer-wrap {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 0 18px 10px;
+    }
+
+    .viewer {
+      position: relative;
+      width: min(100%, calc((100vh - 104px) * 16 / 9));
+      max-height: calc(100vh - 104px);
+      margin: 0;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #111827;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .viewer img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #111827;
+      user-select: none;
+    }
+
+    .load-error {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      color: #fff;
+      background: rgba(17, 24, 39, .9);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .viewer.error .load-error { display: grid; }
+
+    .page-toast {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 2147483647;
+      display: block;
+      min-width: 148px;
+      padding: 16px 24px;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(0, 0, 0, .78);
+      font-size: clamp(34px, 4vw, 56px);
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .32);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(12px) scale(.96);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 18px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progress {
+      flex: 1;
+      max-width: 260px;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dce5f2;
+    }
+
+    .bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width .2s ease;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .print-pages { display: none; }
+
+    :fullscreen .app {
+      grid-template-columns: 1fr;
+      background: #000;
+    }
+
+    :fullscreen .sidebar,
+    :fullscreen .topline,
+    :fullscreen .footer,
+    :fullscreen .open-sidebar {
+      display: none;
+    }
+
+    :fullscreen .stage {
+      height: 100vh;
+      background: #000;
+    }
+
+    :fullscreen .viewer-wrap { padding: 0; }
+
+    :fullscreen .viewer {
+      width: 100vw;
+      max-height: none;
+      height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    :fullscreen .viewer img {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+
+      .app {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .app.sidebar-collapsed .sidebar { display: none; }
+
+      .thumbs {
+        display: flex;
+        overflow-x: auto;
+      }
+
+      .thumb {
+        flex: 0 0 154px;
+        grid-template-columns: 1fr;
+      }
+
+      .thumb img { width: 100%; }
+
+      .stage { height: auto; }
+
+      .viewer {
+        width: 100%;
+        max-height: none;
+      }
+    }
+
+    @media print {
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+
+      .app,
+      .page-toast {
+        display: none !important;
+      }
+
+      .print-pages { display: block; }
+
+      .print-pages img {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        object-fit: contain;
+        object-position: center center;
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .print-pages img:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <aside class="sidebar" aria-label="课件导航">
+      <section class="brand">
+        <h1>最后一程，稳稳向前</h1>
+        <p id="counter">1 / 26</p>
+      </section>
+
+      <section class="tools">
+        <button class="btn play" id="startBtn" type="button">开始上课</button>
+        <select class="sr-only" id="slideSelect" aria-label="选择页码"></select>
+
+        <div class="control-group">
+          <div class="group-label">翻页</div>
+          <div class="btn-row">
+            <button class="btn" id="prevBtn" type="button">上一页</button>
+            <button class="btn primary" id="nextBtn" type="button">下一页</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="group-label">输出</div>
+          <div class="print-row">
+            <button class="btn" id="printBtn" type="button">打印课件</button>
+            <button class="btn" id="exportBtn" type="button">保存课件PDF</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="group-label">视图</div>
+          <button class="btn" id="collapseBtn" type="button">隐藏缩略图</button>
+        </div>
+      </section>
+
+      <nav class="thumbs" id="thumbs" aria-label="缩略图"></nav>
+    </aside>
+
+    <section class="stage" aria-label="课件播放区">
+      <button class="open-sidebar" id="openSidebarBtn" type="button">展开侧栏</button>
+      <header class="topline">
+        <strong id="slideLabel">第 1 页</strong>
+      </header>
+
+      <div class="viewer-wrap">
+        <figure class="viewer" id="viewer">
+          <img id="slideImage" src="assets/slides/slide-01.jpg" alt="最后一程，稳稳向前第 1 页" draggable="false">
+          <div class="load-error" id="loadError">当前页面图片未能加载。请确认 assets/slides 文件夹与 index.html 放在同一目录下。</div>
+        </figure>
+      </div>
+
+      <footer class="footer">
+        <span>← / → 翻页，空格下一页，P 打印</span>
+        <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+      </footer>
+    </section>
+  </main>
+
+  <section class="print-pages" id="printPages" aria-hidden="true"></section>
+  <div class="page-toast" id="pageToast" role="status" aria-live="polite">1 / 26</div>
+
+  <script>
+    const total = 26;
+    const app = document.querySelector("#app");
+    const viewer = document.querySelector("#viewer");
+    const slideImage = document.querySelector("#slideImage");
+    const slideLabel = document.querySelector("#slideLabel");
+    const slideSelect = document.querySelector("#slideSelect");
+    const counter = document.querySelector("#counter");
+    const thumbs = document.querySelector("#thumbs");
+    const bar = document.querySelector("#bar");
+    const printPages = document.querySelector("#printPages");
+    const pageToast = document.querySelector("#pageToast");
+    const storageKey = "last-journey-class-meeting-current-slide";
+    let current = 1;
+    let toastTimer;
+
+    function pad(num) {
+      return String(num).padStart(2, "0");
+    }
+
+    function slideSrc(num) {
+      return `assets/slides/slide-${pad(num)}.jpg`;
+    }
+
+    function thumbSrc(num) {
+      return `assets/thumbs/thumb-${pad(num)}.jpg`;
+    }
+
+    function saveCurrentSlide() {
+      try {
+        localStorage.setItem(storageKey, String(current));
+      } catch {}
+    }
+
+    function readSavedSlide() {
+      try {
+        const saved = Number(localStorage.getItem(storageKey));
+        return Number.isFinite(saved) && saved >= 1 && saved <= total ? saved : 1;
+      } catch {
+        return 1;
+      }
+    }
+
+    function flashPageToast() {
+      pageToast.textContent = `${current} / ${total}`;
+      clearTimeout(toastTimer);
+      pageToast.style.opacity = "1";
+      pageToast.style.transform = "translateY(0) scale(1)";
+      toastTimer = setTimeout(() => {
+        pageToast.style.opacity = "0";
+        pageToast.style.transform = "translateY(12px) scale(.96)";
+      }, 1000);
+    }
+
+    function showSlide(num, options = {}) {
+      const { flash = true } = options;
+      const nextSlide = Math.min(total, Math.max(1, num));
+      const changed = nextSlide !== current;
+      current = nextSlide;
+      viewer.classList.remove("error");
+      slideImage.src = slideSrc(current);
+      slideImage.alt = `最后一程，稳稳向前第 ${current} 页`;
+      slideLabel.textContent = `第 ${current} 页`;
+      counter.textContent = `${current} / ${total}`;
+      slideSelect.value = String(current);
+      bar.style.width = `${(current / total) * 100}%`;
+      saveCurrentSlide();
+
+      if (flash && changed) {
+        flashPageToast();
+      }
+
+      document.querySelectorAll(".thumb").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.slide) === current);
+      });
+
+      const active = document.querySelector(".thumb.active");
+      if (active) {
+        thumbs.scrollTop = active.offsetTop - (thumbs.clientHeight - active.offsetHeight) / 2;
+        thumbs.scrollLeft = active.offsetLeft - (thumbs.clientWidth - active.offsetWidth) / 2;
+      }
+
+      const nextImage = new Image();
+      nextImage.src = slideSrc(Math.min(total, current + 1));
+    }
+
+    function next() {
+      showSlide(current + 1);
+    }
+
+    function prev() {
+      showSlide(current - 1);
+    }
+
+    function startPlay() {
+      app.classList.add("sidebar-collapsed");
+      document.documentElement.requestFullscreen?.();
+    }
+
+    function collapseSidebar() {
+      app.classList.add("sidebar-collapsed");
+    }
+
+    function openSidebar() {
+      app.classList.remove("sidebar-collapsed");
+    }
+
+    function printDeck() {
+      window.print();
+    }
+
+    for (let i = 1; i <= total; i += 1) {
+      const option = document.createElement("option");
+      option.value = String(i);
+      option.textContent = `第 ${i} 页`;
+      slideSelect.appendChild(option);
+
+      const thumb = document.createElement("button");
+      thumb.type = "button";
+      thumb.className = "thumb";
+      thumb.dataset.slide = String(i);
+      thumb.innerHTML = `<img src="${thumbSrc(i)}" alt="第 ${i} 页缩略图"><span>第 ${i} 页</span>`;
+      thumb.addEventListener("click", () => showSlide(i));
+      thumbs.appendChild(thumb);
+
+      const printImage = document.createElement("img");
+      printImage.src = slideSrc(i);
+      printImage.alt = `最后一程，稳稳向前第 ${i} 页`;
+      printPages.appendChild(printImage);
+    }
+
+    slideImage.addEventListener("error", () => viewer.classList.add("error"));
+    slideImage.addEventListener("load", () => viewer.classList.remove("error"));
+
+    document.querySelector("#startBtn").addEventListener("click", startPlay);
+    document.querySelector("#prevBtn").addEventListener("click", prev);
+    document.querySelector("#nextBtn").addEventListener("click", next);
+    document.querySelector("#collapseBtn").addEventListener("click", collapseSidebar);
+    document.querySelector("#openSidebarBtn").addEventListener("click", openSidebar);
+    document.querySelector("#printBtn").addEventListener("click", printDeck);
+    document.querySelector("#exportBtn").addEventListener("click", printDeck);
+    slideSelect.addEventListener("change", () => showSlide(Number(slideSelect.value)));
+
+    viewer.addEventListener("click", (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+      event.preventDefault();
+      next();
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement) {
+        openSidebar();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        next();
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        prev();
+      }
+      if (event.key.toLowerCase() === "p") {
+        event.preventDefault();
+        printDeck();
+      }
+    });
+
+    showSlide(readSavedSlide(), { flash: false });
+  </script>
+</body>
+</html>
